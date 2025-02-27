@@ -1,0 +1,175 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Workspace\\PersonalProjects\\SmartBurguerValue\\SmartBurguerValueAPI\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{2A6ECD19-6FBB-4D31-8876-8FB5E9B50F57}|SmartBurguerValueAPI\\SmartBurguerValueAPI.csproj|c:\\workspace\\personalprojects\\smartburguervalue\\smartburguervalueapi\\smartburguervalueapi\\migrations\\20250227014017_create-category-products.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2A6ECD19-6FBB-4D31-8876-8FB5E9B50F57}|SmartBurguerValueAPI\\SmartBurguerValueAPI.csproj|solutionrelative:smartburguervalueapi\\migrations\\20250227014017_create-category-products.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2A6ECD19-6FBB-4D31-8876-8FB5E9B50F57}|SmartBurguerValueAPI\\SmartBurguerValueAPI.csproj|c:\\workspace\\personalprojects\\smartburguervalue\\smartburguervalueapi\\smartburguervalueapi\\migrations\\20250227014259_fix||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{2A6ECD19-6FBB-4D31-8876-8FB5E9B50F57}|SmartBurguerValueAPI\\SmartBurguerValueAPI.csproj|solutionrelative:smartburguervalueapi\\migrations\\20250227014259_fix||{8B382828-6202-11D1-8870-0000F87579D2}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2A6ECD19-6FBB-4D31-8876-8FB5E9B50F57}|SmartBurguerValueAPI\\SmartBurguerValueAPI.csproj|c:\\workspace\\personalprojects\\smartburguervalue\\smartburguervalueapi\\smartburguervalueapi\\models\\baseentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2A6ECD19-6FBB-4D31-8876-8FB5E9B50F57}|SmartBurguerValueAPI\\SmartBurguerValueAPI.csproj|solutionrelative:smartburguervalueapi\\models\\baseentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2A6ECD19-6FBB-4D31-8876-8FB5E9B50F57}|SmartBurguerValueAPI\\SmartBurguerValueAPI.csproj|c:\\workspace\\personalprojects\\smartburguervalue\\smartburguervalueapi\\smartburguervalueapi\\models\\products\\categoryproductsentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2A6ECD19-6FBB-4D31-8876-8FB5E9B50F57}|SmartBurguerValueAPI\\SmartBurguerValueAPI.csproj|solutionrelative:smartburguervalueapi\\models\\products\\categoryproductsentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2A6ECD19-6FBB-4D31-8876-8FB5E9B50F57}|SmartBurguerValueAPI\\SmartBurguerValueAPI.csproj|c:\\workspace\\personalprojects\\smartburguervalue\\smartburguervalueapi\\smartburguervalueapi\\context\\smartburguervalueapicontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2A6ECD19-6FBB-4D31-8876-8FB5E9B50F57}|SmartBurguerValueAPI\\SmartBurguerValueAPI.csproj|solutionrelative:smartburguervalueapi\\context\\smartburguervalueapicontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 14,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "20250227014259_Fix",
+              "DocumentMoniker": "C:\\Workspace\\PersonalProjects\\SmartBurguerValue\\SmartBurguerValueAPI\\SmartBurguerValueAPI\\Migrations\\20250227014259_Fix",
+              "RelativeDocumentMoniker": "SmartBurguerValueAPI\\Migrations\\20250227014259_Fix",
+              "ToolTip": "C:\\Workspace\\PersonalProjects\\SmartBurguerValue\\SmartBurguerValueAPI\\SmartBurguerValueAPI\\Migrations\\20250227014259_Fix",
+              "RelativeToolTip": "SmartBurguerValueAPI\\Migrations\\20250227014259_Fix",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-02-27T01:43:07.596Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "BaseEntity.cs",
+              "DocumentMoniker": "C:\\Workspace\\PersonalProjects\\SmartBurguerValue\\SmartBurguerValueAPI\\SmartBurguerValueAPI\\Models\\BaseEntity.cs",
+              "RelativeDocumentMoniker": "SmartBurguerValueAPI\\Models\\BaseEntity.cs",
+              "ToolTip": "C:\\Workspace\\PersonalProjects\\SmartBurguerValue\\SmartBurguerValueAPI\\SmartBurguerValueAPI\\Models\\BaseEntity.cs",
+              "RelativeToolTip": "SmartBurguerValueAPI\\Models\\BaseEntity.cs",
+              "ViewState": "AgIAAAIAAAAAAAAAAAAxwAcAAAAOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-27T01:42:19.467Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:131:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:134:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:133:0:{13b12e3e-c1b4-4539-9371-4fe9a0d523fc}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:133:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:132:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c64b9c2-e352-428e-a56d-0ace190b99a6}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:132:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "20250227014017_Create-category-products.cs",
+              "DocumentMoniker": "C:\\Workspace\\PersonalProjects\\SmartBurguerValue\\SmartBurguerValueAPI\\SmartBurguerValueAPI\\Migrations\\20250227014017_Create-category-products.cs",
+              "RelativeDocumentMoniker": "SmartBurguerValueAPI\\Migrations\\20250227014017_Create-category-products.cs",
+              "ToolTip": "C:\\Workspace\\PersonalProjects\\SmartBurguerValue\\SmartBurguerValueAPI\\SmartBurguerValueAPI\\Migrations\\20250227014017_Create-category-products.cs",
+              "RelativeToolTip": "SmartBurguerValueAPI\\Migrations\\20250227014017_Create-category-products.cs",
+              "ViewState": "AgIAAA0AAAAAAAAAAAAgwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-27T01:40:28.875Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "SmartBurguerValueAPIContext.cs",
+              "DocumentMoniker": "C:\\Workspace\\PersonalProjects\\SmartBurguerValue\\SmartBurguerValueAPI\\SmartBurguerValueAPI\\Context\\SmartBurguerValueAPIContext.cs",
+              "RelativeDocumentMoniker": "SmartBurguerValueAPI\\Context\\SmartBurguerValueAPIContext.cs",
+              "ToolTip": "C:\\Workspace\\PersonalProjects\\SmartBurguerValue\\SmartBurguerValueAPI\\SmartBurguerValueAPI\\Context\\SmartBurguerValueAPIContext.cs",
+              "RelativeToolTip": "SmartBurguerValueAPI\\Context\\SmartBurguerValueAPIContext.cs",
+              "ViewState": "AgIAAAgAAAAAAAAAAAAAwBAAAABMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-27T01:36:29.16Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "CategoryProductsEntity.cs",
+              "DocumentMoniker": "C:\\Workspace\\PersonalProjects\\SmartBurguerValue\\SmartBurguerValueAPI\\SmartBurguerValueAPI\\Models\\Products\\CategoryProductsEntity.cs",
+              "RelativeDocumentMoniker": "SmartBurguerValueAPI\\Models\\Products\\CategoryProductsEntity.cs",
+              "ToolTip": "C:\\Workspace\\PersonalProjects\\SmartBurguerValue\\SmartBurguerValueAPI\\SmartBurguerValueAPI\\Models\\Products\\CategoryProductsEntity.cs",
+              "RelativeToolTip": "SmartBurguerValueAPI\\Models\\Products\\CategoryProductsEntity.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAtAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-27T01:28:47.991Z",
+              "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedWidth": 180,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:131:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
