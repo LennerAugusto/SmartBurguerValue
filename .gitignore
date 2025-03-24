@@ -1,1 +1,56 @@
-ECHO est� ativado.
+ECHO est� ativado.
+# Arquivos de compilação e temporários do .NET
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+*.log
+*.cache
+
+# Pastas do Visual Studio e arquivos de configuração locais
+.vs/
+.idea/
+*.user
+*.suo
+*.dbmdl
+*.sln.docstates
+*.VC.db
+
+# Configurações locais do projeto e cache
+*.local
+*.swp
+*.lock
+*.ncb
+*.opendb
+*.pidb
+
+# Logs e arquivos gerados
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Arquivos de cache do NuGet
+**/packages/*
+!**/packages/build/
+!**/packages/repositories.config
+
+# Configuração do Rider/ReSharper
+*.DotSettings.user
+_ReSharper*/
+*.resharper
+
+# Arquivos do MacOS/Linux que podem aparecer
+.DS_Store
+*.swp
+
+# Configuração do Entity Framework Migrations (pode ser necessário manter alguns arquivos, dependendo do caso)
+Migrations/
+
+# Arquivos do TypeScript (caso use Blazor ou front-end integrado)
+node_modules/
+wwwroot/node_modules/
+dist/
+build/

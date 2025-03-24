@@ -5,21 +5,32 @@ namespace SmartBurguerValueAPI.Context
 {
     public class SmartBurguerValueAPIContext : DbContext
     {
-        public SmartBurguerValueAPIContext(DbContextOptions<SmartBurguerValueAPIContext>options) : base(options)
+        public SmartBurguerValueAPIContext(DbContextOptions<SmartBurguerValueAPIContext> options) : base(options)
         {
 
         }
-        public DbSet<CategoryProductsEntity> Clients { get; set; }
+        public DbSet<CategoryProductsEntity> CategoryProducts { get; set; }
+        public DbSet<UnityTypesProductsEntity> UnityTypesProducts { get; set; }
+        public DbSet<ProductsEntity> Products { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<CategoryProductsEntity>().HasKey(e => e.Id);
-            //modelBuilder.Entity<ClientEntity>()
-            //    .HasMany(c => c.OrderServices)
-            //    .WithOne(o => o.Client)
-            //    .HasForeignKey(o => o.ClientId)
-            //    .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<UnityTypesProductsEntity>().HasKey(e => e.Id);
+
+            modelBuilder.Entity<ProductsEntity>()
+                .HasOne(p => p.Category)
+                .WithMany(c => c.Products)
+                .HasForeignKey(p => p.CategoryId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ProductsEntity>()
+               .HasOne(p => p.UnityTypes)
+               .WithMany(c => c.Products)
+               .HasForeignKey(p => p.UnityTypeId)
+               .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

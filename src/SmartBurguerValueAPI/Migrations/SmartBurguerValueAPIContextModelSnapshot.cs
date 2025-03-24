@@ -45,6 +45,105 @@ namespace SmartBurguerValueAPI.Migrations
 
                     b.ToTable("CategoryProducts");
                 });
+
+            modelBuilder.Entity("SmartBurguerValueAPI.Models.Products.ProductsEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("CategoryId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("DateUpdated")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<float>("QuantityPerPackage")
+                        .HasColumnType("float");
+
+                    b.Property<Guid>("UnityTypeId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<float>("UnityValue")
+                        .HasColumnType("float");
+
+                    b.Property<float>("ValuePerPackage")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("UnityTypeId");
+
+                    b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("SmartBurguerValueAPI.Models.Products.UnityTypesProductsEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("DateUpdated")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Symbol")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UnitytypesProducts");
+                });
+
+            modelBuilder.Entity("SmartBurguerValueAPI.Models.Products.ProductsEntity", b =>
+                {
+                    b.HasOne("SmartBurguerValueAPI.Models.Products.CategoryProductsEntity", "Category")
+                        .WithMany("Products")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SmartBurguerValueAPI.Models.Products.UnityTypesProductsEntity", "UnityTypes")
+                        .WithMany("Products")
+                        .HasForeignKey("UnityTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("UnityTypes");
+                });
+
+            modelBuilder.Entity("SmartBurguerValueAPI.Models.Products.CategoryProductsEntity", b =>
+                {
+                    b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("SmartBurguerValueAPI.Models.Products.UnityTypesProductsEntity", b =>
+                {
+                    b.Navigation("Products");
+                });
 #pragma warning restore 612, 618
         }
     }

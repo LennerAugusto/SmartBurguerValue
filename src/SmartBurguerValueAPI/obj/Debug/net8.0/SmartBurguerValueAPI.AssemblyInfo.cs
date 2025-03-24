@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SmartBurguerValueAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+05a8a391e9b83b59e6b8ee39c732d88f82e918c1")]
 [assembly: System.Reflection.AssemblyProductAttribute("SmartBurguerValueAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SmartBurguerValueAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
