@@ -4,6 +4,7 @@ using SmartBurguerValueAPI.Context;
 using SmartBurguerValueAPI.DTOs.Products;
 using SmartBurguerValueAPI.DTOs;
 using SmartBurguerValueAPI.Models.Products;
+using SmartBurguerValueAPI.IRepository.IProducts;
 
 namespace SmartBurguerValueAPI.Controllers
 {
@@ -11,93 +12,48 @@ namespace SmartBurguerValueAPI.Controllers
     public class UnitTypesProductsController : ControllerBase
     {
         private readonly SmartBurguerValueAPIContext _context;
+        private readonly IUnityTypesRepository _repository;
 
-        public UnitTypesProductsController(SmartBurguerValueAPIContext context)
+        public UnitTypesProductsController(SmartBurguerValueAPIContext context, IUnityTypesRepository repository)
         {
             _context = context;
+            _repository = repository;
         }
 
         [HttpGet("get-all")]
         public ActionResult<IEnumerable<BaseDTO>> GetAllUnityTypesProducts()
         {
-            var clients = _context.CategoryProducts
-                .ToList();
-
-            if (!clients.Any())
-            {
-                return NotFound("Não existem tipos de produtos cadastrados");
-            }
-
-            return Ok(clients);
+            var UnityTypes = _repository.GetAllUnityTypesProducts();
+            return Ok(UnityTypes);
         }
 
-        [HttpGet("get-by-id/{id}")]
-        public async Task<IActionResult> GetUnityTypeById(Guid UnitTypeId)
+        [HttpGet("get-by-id/")]
+        public async Task<IActionResult> GetUnityTypeById(Guid unityTypeId)
         {
-            var unity = _context.UnityTypesProducts.FirstOrDefault(c => c.Id != UnitTypeId);
-            if (unity == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(unity);
+            var UnityTypes = _repository.GetUnityTypeProductsById(unityTypeId);
+            return Ok(UnityTypes);
         }
 
         [HttpPost("create")]
-        public async Task<ActionResult<BaseDTO>> CreateUnityType(BaseDTO UnityTypeProducts)
+        public async Task<ActionResult<BaseDTO>> CreateUnityType([FromBody] BaseDTO UnityTypeProducts)
         {
-            UnityTypeProducts.Id = Guid.NewGuid();
-
-            using (var transaction = await _context.Database.BeginTransactionAsync())
-            {
-                try
-                {
-                    await _context.UnityTypesProducts.AddAsync(new UnityTypesProductsEntity
-                    {
-                        Id = UnityTypeProducts.Id,
-                        Name = UnityTypeProducts.Name
-
-                    });
-
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-                }
-                catch (Exception ex)
-                {
-                    await transaction.RollbackAsync();
-                    return StatusCode(500, $"Internal server error: {ex.Message}");
-                }
-            }
-
-            return CreatedAtAction(nameof(GetUnityTypeById), new { id = UnityTypeProducts.Id }, UnityTypeProducts);
+            var UnityType = _repository.CreateUnityTypesProducts(UnityTypeProducts);
+            return Ok(UnityType);
         }
 
 
-        [HttpPut("update/{id:guid}")]
-        public ActionResult Put(Guid id, UnityTypesProductsEntity category)
+        [HttpPut("update/")]
+        public ActionResult Put(BaseDTO unityTypeProducts)
         {
-            if (id != category.Id)
-            {
-                return BadRequest("Tipo de produto solicitado não existe");
-            }
-            _context.Entry(category).State = EntityState.Modified;
-            _context.SaveChanges();
-
-            return Ok(category);
-            ;
+            var UnityType = _repository.UpdateUnityTypesProducts(unityTypeProducts);
+            return Ok(UnityType);
         }
 
         [HttpDelete("delete/{id:guid}")]
         public ActionResult Delete(Guid id)
         {
-            var type = _context.UnityTypesProducts.FirstOrDefault(c => c.Id == id);
-            if (type == null)
-            {
-                return NotFound("Tipo de produto não encontrado");
-            }
-            _context.UnityTypesProducts.Remove(type);
-            _context.SaveChanges();
-            return Ok(type);
+            var UnityType = _repository.DeleteUnityTypeProducts(id);
+            return Ok(UnityType);
         }
     }
 }
