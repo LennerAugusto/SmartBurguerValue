@@ -2,9 +2,12 @@ using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
 using SmartBurguerValueAPI.Context;
 using SmartBurguerValueAPI.IRepository.IProducts;
+using SmartBurguerValueAPI.IRepository.IRepositoryBase;
+
 
 //using SmartBurguerValueAPI.Filters;
 using SmartBurguerValueAPI.Mappings;
+using SmartBurguerValueAPI.Repository.Base;
 using SmartBurguerValueAPI.Repository.ProductsRepository;
 using System.Text.Json.Serialization;
 
@@ -21,6 +24,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 //Mapeamento Interfaces
+builder.Services.AddScoped(typeof(IRepositoryBase<>), typeof(RepositoryBase<>));
 builder.Services.AddScoped<ICategoryProducts, CategoryProductsRepository>();
 builder.Services.AddScoped<IUnityTypesRepository, UnityTypesProductsRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
@@ -32,7 +36,7 @@ builder.Services.AddSwaggerGen();
 
 string mySqlConnection = builder.Configuration.GetConnectionString("DefaultConnection");
 
-builder.Services.AddDbContext<SmartBurguerValueAPIContext>(options =>
+builder.Services.AddDbContext<AppDbContext>(options =>
 options.UseMySql(mySqlConnection,
                     ServerVersion.AutoDetect(mySqlConnection)));
 

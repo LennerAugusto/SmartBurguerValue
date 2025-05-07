@@ -11,7 +11,7 @@ using SmartBurguerValueAPI.Context;
 
 namespace SmartBurguerValueAPI.Migrations
 {
-    [DbContext(typeof(SmartBurguerValueAPIContext))]
+    [DbContext(typeof(AppDbContext))]
     [Migration("20250227014017_Create-category-products")]
     partial class Createcategoryproducts
     {

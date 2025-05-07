@@ -12,10 +12,10 @@ namespace SmartBurguerValueAPI.Controllers
     [Route("api/products")]
     public class ProductsController : ControllerBase
     {
-        private readonly SmartBurguerValueAPIContext _context;
+        private readonly AppDbContext _context;
         private readonly IProductRepository _repository;
 
-        public ProductsController(IProductRepository repository, SmartBurguerValueAPIContext context)
+        public ProductsController(IProductRepository repository, AppDbContext context)
         {
             _context = context;
             _repository = repository;

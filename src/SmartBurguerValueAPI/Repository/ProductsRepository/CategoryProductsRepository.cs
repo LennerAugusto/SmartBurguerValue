@@ -6,15 +6,16 @@ using SmartBurguerValueAPI.DTOs.Products;
 using SmartBurguerValueAPI.IRepository.IProducts;
 using SmartBurguerValueAPI.Models.Products;
 using SmartBurguerValueAPI.ReadModels;
+using SmartBurguerValueAPI.Repository.Base;
 
 namespace SmartBurguerValueAPI.Repository.ProductsRepository
 {
-    public class CategoryProductsRepository : ICategoryProducts
+    public class CategoryProductsRepository : RepositoryBase<CategoryProductsEntity>, ICategoryProducts
     {
-        private readonly SmartBurguerValueAPIContext _context;
+        private readonly AppDbContext _context;
         private readonly IMapper _mapper;
 
-        public CategoryProductsRepository(SmartBurguerValueAPIContext context, IMapper mapper)
+        public CategoryProductsRepository(AppDbContext context, IMapper mapper) : base(context)
         {
             _mapper = mapper;
             _context = context;

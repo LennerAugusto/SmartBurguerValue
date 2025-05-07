@@ -3,9 +3,9 @@ using SmartBurguerValueAPI.Models.Products;
 
 namespace SmartBurguerValueAPI.Context
 {
-    public class SmartBurguerValueAPIContext : DbContext
+    public class AppDbContext : DbContext
     {
-        public SmartBurguerValueAPIContext(DbContextOptions<SmartBurguerValueAPIContext> options) : base(options)
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
 
         }

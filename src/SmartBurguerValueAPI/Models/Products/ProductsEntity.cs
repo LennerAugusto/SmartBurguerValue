@@ -13,5 +13,6 @@ namespace SmartBurguerValueAPI.Models.Products
         public float QuantityPerPackage { get; set; }
         public float ValuePerPackage { get; set; }
         public float UnityValue { get; set; }
+        public EnterpriseEntity Enterprise { get; set; }
     }
 }

@@ -1,9 +1,11 @@
 ﻿using SmartBurguerValueAPI.DTOs.Products;
+using SmartBurguerValueAPI.IRepository.IRepositoryBase;
+using SmartBurguerValueAPI.Models;
 using SmartBurguerValueAPI.Models.Products;
 
 namespace SmartBurguerValueAPI.IRepository.IProducts
 {
-    public interface IProductRepository 
+    public interface IProductRepository : IRepositoryBase<ProductsEntity>
     {
         IEnumerable<ProductsEntity> GetAllProducts();
         ProductsEntity GetProductById(Guid Id);

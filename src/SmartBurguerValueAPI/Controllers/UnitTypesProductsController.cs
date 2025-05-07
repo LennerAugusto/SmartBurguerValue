@@ -11,10 +11,10 @@ namespace SmartBurguerValueAPI.Controllers
     [Route("api/unit-types-products")]
     public class UnitTypesProductsController : ControllerBase
     {
-        private readonly SmartBurguerValueAPIContext _context;
+        private readonly AppDbContext _context;
         private readonly IUnityTypesRepository _repository;
 
-        public UnitTypesProductsController(SmartBurguerValueAPIContext context, IUnityTypesRepository repository)
+        public UnitTypesProductsController(AppDbContext context, IUnityTypesRepository repository)
         {
             _context = context;
             _repository = repository;

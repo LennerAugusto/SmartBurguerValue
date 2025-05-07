@@ -11,7 +11,7 @@ using SmartBurguerValueAPI.Context;
 
 namespace SmartBurguerValueAPI.Migrations
 {
-    [DbContext(typeof(SmartBurguerValueAPIContext))]
+    [DbContext(typeof(AppDbContext))]
     [Migration("20250311003612_alter-table-unity-types-and-products")]
     partial class altertableunitytypesandproducts
     {

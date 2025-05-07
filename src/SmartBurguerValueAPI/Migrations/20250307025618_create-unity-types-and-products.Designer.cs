@@ -11,7 +11,7 @@ using SmartBurguerValueAPI.Context;
 
 namespace SmartBurguerValueAPI.Migrations
 {
-    [DbContext(typeof(SmartBurguerValueAPIContext))]
+    [DbContext(typeof(AppDbContext))]
     [Migration("20250307025618_create-unity-types-and-products")]
     partial class createunitytypesandproducts
     {
