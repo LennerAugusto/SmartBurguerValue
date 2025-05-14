@@ -2,16 +2,13 @@
 
 namespace SmartBurguerValueAPI.Models.Products
 {
-    [Table("Products")]
-    public class ProductsEntity : BaseEntity
+    [Table("Combos")]
+    public class ComboEntity : BaseEntity
     {
         public string Name { get; set; }
         public string? Description { get; set; }
-
-        public string? ImageUrl { get; set; }
         public Guid EnterpriseId { get; set; }
         public EnterpriseEntity Enterprise { get; set; }
-        public ICollection<ProductsIngredientsEntity> ProductIngredients { get; set; }
         public ICollection<ComboProduct> ComboProducts { get; set; }
     }
 }

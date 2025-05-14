@@ -5,55 +5,65 @@ using SmartBurguerValueAPI.DTOs.Products;
 using SmartBurguerValueAPI.DTOs;
 using SmartBurguerValueAPI.Models.Products;
 using SmartBurguerValueAPI.IRepository.IProducts;
+using SmartBurguerValueAPI.Interfaces;
+using SmartBurguerValueAPI.Repository;
 
 namespace SmartBurguerValueAPI.Controllers
 {
-    [Route("api/unit-types-products")]
+    [Route("api/unit-types")]
     public class UnitTypesProductsController : ControllerBase
     {
         private readonly AppDbContext _context;
-        private readonly IUnityTypesRepository _repository;
+        private readonly IUnityOfWork _unityOfWork;
 
-        public UnitTypesProductsController(AppDbContext context, IUnityTypesRepository repository)
+        public UnitTypesProductsController(AppDbContext context, IUnityOfWork unityOfWork)
         {
             _context = context;
-            _repository = repository;
+            _unityOfWork = unityOfWork;
         }
 
         [HttpGet("get-all")]
-        public ActionResult<IEnumerable<BaseDTO>> GetAllUnityTypesProducts()
+        public async Task<ActionResult<IEnumerable<UnityTypesDTO>>> GetAllUnityTypes()
         {
-            var UnityTypes = _repository.GetAllUnityTypesProducts();
+            var UnityTypes = await _unityOfWork.UnityTypesRepository.GetAll();
             return Ok(UnityTypes);
         }
 
         [HttpGet("get-by-id/")]
         public async Task<IActionResult> GetUnityTypeById(Guid unityTypeId)
         {
-            var UnityTypes = _repository.GetUnityTypeProductsById(unityTypeId);
+            var UnityTypes = await _unityOfWork.UnityTypesRepository.GetById(unityTypeId);
             return Ok(UnityTypes);
         }
 
         [HttpPost("create")]
-        public async Task<ActionResult<BaseDTO>> CreateUnityType([FromBody] BaseDTO UnityTypeProducts)
+        public async Task<ActionResult<UnityTypesDTO>> CreateUnityType([FromBody] UnityTypesProductsEntity unityType)
         {
-            var UnityType = _repository.CreateUnityTypesProducts(UnityTypeProducts);
+            var UnityType =  _unityOfWork.UnityTypesRepository.Create(unityType);
+            _unityOfWork.Commit();
             return Ok(UnityType);
         }
 
 
         [HttpPut("update/")]
-        public ActionResult Put(BaseDTO unityTypeProducts)
+        public ActionResult Put([FromBody]UnityTypesProductsEntity unityType)
         {
-            var UnityType = _repository.UpdateUnityTypesProducts(unityTypeProducts);
+            var UnityType = _unityOfWork.UnityTypesRepository.Update(unityType);
+            _unityOfWork.Commit();
             return Ok(UnityType);
         }
 
         [HttpDelete("delete/{id:guid}")]
-        public ActionResult Delete(Guid id)
+        public async Task<ActionResult> Delete(Guid id)
         {
-            var UnityType = _repository.DeleteUnityTypeProducts(id);
-            return Ok(UnityType);
+            var Entity = await _unityOfWork.UnityTypesRepository.GetById(id);
+            
+            if (Entity == null)
+                return NotFound();
+            
+            await _unityOfWork.UnityTypesRepository.Delete(Entity);
+            _unityOfWork.Commit();
+            return Ok(Entity);
         }
     }
 }

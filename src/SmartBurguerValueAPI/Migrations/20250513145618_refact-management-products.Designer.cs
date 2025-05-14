@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartBurguerValueAPI.Context;
 
@@ -11,9 +12,11 @@ using SmartBurguerValueAPI.Context;
 namespace SmartBurguerValueAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class SmartBurguerValueAPIContextModelSnapshot : ModelSnapshot
+    [Migration("20250513145618_refact-management-products")]
+    partial class refactmanagementproducts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -279,6 +282,51 @@ namespace SmartBurguerValueAPI.Migrations
                     b.ToTable("UnitytypesProducts");
                 });
 
+            modelBuilder.Entity("SmartBurguerValueAPI.Models.UsersEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime>("DateUpdated")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<Guid>("EnterpriseId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Role")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("EnterpriseId");
+
+                    b.ToTable("Users");
+                });
+
             modelBuilder.Entity("SmartBurguerValueAPI.Models.Products.ComboEntity", b =>
                 {
                     b.HasOne("SmartBurguerValueAPI.Models.EnterpriseEntity", "Enterprise")
@@ -358,6 +406,17 @@ namespace SmartBurguerValueAPI.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("SmartBurguerValueAPI.Models.UsersEntity", b =>
+                {
+                    b.HasOne("SmartBurguerValueAPI.Models.EnterpriseEntity", "Enterprise")
+                        .WithMany("Users")
+                        .HasForeignKey("EnterpriseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Enterprise");
+                });
+
             modelBuilder.Entity("SmartBurguerValueAPI.Models.EnterpriseEntity", b =>
                 {
                     b.Navigation("Combos");
@@ -365,6 +424,8 @@ namespace SmartBurguerValueAPI.Migrations
                     b.Navigation("Ingredients");
 
                     b.Navigation("Products");
+
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("SmartBurguerValueAPI.Models.Products.ComboEntity", b =>

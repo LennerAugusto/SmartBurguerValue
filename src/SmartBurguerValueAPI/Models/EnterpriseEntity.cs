@@ -1,5 +1,6 @@
 ﻿using SmartBurguerValueAPI.Models.Products;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.CompilerServices;
 
 namespace SmartBurguerValueAPI.Models
 {
@@ -14,8 +15,10 @@ namespace SmartBurguerValueAPI.Models
         public string? Street { get; set; }
         public string? Number { get; set; }
         public string? CEP { get; set; }
-        public ICollection<UsersEntity> Users { get; set; }
+        public string? Plan { get; set; }
+        //public ICollection<UsersEntity> Users { get; set; }
+        public ICollection<IngredientsEntity> Ingredients { get; set; }
         public ICollection<ProductsEntity> Products { get; set; }
-
+        public ICollection<ComboEntity> Combos { get; set; }
     }
 }

@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="ReadModels\" />
     <Folder Include="Service\" />
   </ItemGroup>
 

@@ -20,18 +20,14 @@ namespace SmartBurguerValueAPI.Repository.Base
             entity.DateCreated = entity.DateCreated == new DateTime() ? DateTime.Now : entity.DateCreated;
             entity.DateUpdated = DateTime.Now;
             _context.Set<T>().Add(entity);
-            await _context.SaveChangesAsync();
         }
-
         public async Task Delete(T entity)
         {
             _context.Set<T>().Remove(entity);
-            await _context.SaveChangesAsync();
         }
-
         public async Task<IEnumerable<T>> GetAll()
         {
-            return await _context.Set<T>().ToListAsync();
+            return await _context.Set<T>().AsNoTracking().ToListAsync();
         }
 
         public IEnumerable<T> GetAll(bool? isActive = null)
@@ -53,13 +49,11 @@ namespace SmartBurguerValueAPI.Repository.Base
         {
             entity.DateUpdated = DateTime.Now;
             _context.Set<T>().Update(entity);
-            await _context.SaveChangesAsync();
         }
 
         public async Task SaveAsync(T model)
         {
             await _context.Set<T>().AddAsync(model);
-            await _context.SaveChangesAsync();
         }
     }
 }

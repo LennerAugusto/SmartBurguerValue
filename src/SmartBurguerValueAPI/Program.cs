@@ -1,12 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
 using SmartBurguerValueAPI.Context;
+using SmartBurguerValueAPI.Interfaces;
 using SmartBurguerValueAPI.IRepository.IProducts;
 using SmartBurguerValueAPI.IRepository.IRepositoryBase;
 
 
 //using SmartBurguerValueAPI.Filters;
 using SmartBurguerValueAPI.Mappings;
+using SmartBurguerValueAPI.Repository;
 using SmartBurguerValueAPI.Repository.Base;
 using SmartBurguerValueAPI.Repository.ProductsRepository;
 using System.Text.Json.Serialization;
@@ -24,10 +26,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 //Mapeamento Interfaces
+builder.Services.AddScoped<IUnityOfWork, UnityOfWork>();
 builder.Services.AddScoped(typeof(IRepositoryBase<>), typeof(RepositoryBase<>));
-builder.Services.AddScoped<ICategoryProducts, CategoryProductsRepository>();
 builder.Services.AddScoped<IUnityTypesRepository, UnityTypesProductsRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IEnterpriseRepository, EnterpriseRepository>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
