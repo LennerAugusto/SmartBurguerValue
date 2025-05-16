@@ -1,6 +1,4 @@
-﻿using SmartBurguerValueAPI.DTOs.Products;
-
-namespace SmartBurguerValueAPI.DTOs
+﻿namespace SmartBurguerValueAPI.DTOs.Products
 {
     public class ProductDTO
     {

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartBurguerValueAPI.Context;
 
@@ -11,9 +12,11 @@ using SmartBurguerValueAPI.Context;
 namespace SmartBurguerValueAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class SmartBurguerValueAPIContextModelSnapshot : ModelSnapshot
+    [Migration("20250516194257_fixed-coast")]
+    partial class fixedcoast
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -86,6 +89,9 @@ namespace SmartBurguerValueAPI.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
 
+                    b.Property<Guid?>("EnterpriseEntityId")
+                        .HasColumnType("char(36)");
+
                     b.Property<Guid>("EnterpriseId")
                         .HasColumnType("char(36)");
 
@@ -101,7 +107,7 @@ namespace SmartBurguerValueAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EnterpriseId");
+                    b.HasIndex("EnterpriseEntityId");
 
                     b.ToTable("FixedCostEntity");
                 });
@@ -316,13 +322,9 @@ namespace SmartBurguerValueAPI.Migrations
 
             modelBuilder.Entity("SmartBurguerValueAPI.Models.FixedCostEntity", b =>
                 {
-                    b.HasOne("SmartBurguerValueAPI.Models.EnterpriseEntity", "Enterprise")
+                    b.HasOne("SmartBurguerValueAPI.Models.EnterpriseEntity", null)
                         .WithMany("FixedCosts")
-                        .HasForeignKey("EnterpriseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Enterprise");
+                        .HasForeignKey("EnterpriseEntityId");
                 });
 
             modelBuilder.Entity("SmartBurguerValueAPI.Models.Products.ComboEntity", b =>

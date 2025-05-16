@@ -30,6 +30,7 @@ namespace SmartBurguerValueAPI.Repository.Base
             return await _context.Set<T>().AsNoTracking().ToListAsync();
         }
 
+
         public IEnumerable<T> GetAll(bool? isActive = null)
         {
             var query = _context.Set<T>().AsQueryable();

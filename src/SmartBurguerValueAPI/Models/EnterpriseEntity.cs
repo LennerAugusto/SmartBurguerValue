@@ -24,5 +24,7 @@ namespace SmartBurguerValueAPI.Models
         public ICollection<ProductsEntity> Products { get; set; }
         [JsonIgnore]
         public ICollection<ComboEntity> Combos { get; set; }
+        [JsonIgnore]
+        public ICollection<FixedCostEntity> FixedCosts { get; set; }
     }
 }

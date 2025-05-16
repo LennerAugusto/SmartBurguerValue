@@ -9,6 +9,6 @@ namespace SmartBurguerValueAPI.Models.Products
         public string? Description { get; set; }
         public Guid EnterpriseId { get; set; }
         public EnterpriseEntity Enterprise { get; set; }
-        public ICollection<ComboProduct> ComboProducts { get; set; }
+        public ICollection<ComboProductEntity> ComboProducts { get; set; }
     }
 }

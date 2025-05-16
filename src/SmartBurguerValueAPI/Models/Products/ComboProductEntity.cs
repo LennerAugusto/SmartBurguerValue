@@ -3,7 +3,7 @@
 namespace SmartBurguerValueAPI.Models.Products
 {
     [Table("ComboProduct")]
-    public class ComboProduct : BaseEntity
+    public class ComboProductEntity : BaseEntity
     {
         public Guid ComboId { get; set; }
         public ComboEntity Combo { get; set; }

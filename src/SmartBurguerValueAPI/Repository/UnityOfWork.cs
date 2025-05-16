@@ -13,6 +13,8 @@ namespace SmartBurguerValueAPI.Repository
         public IUnityTypesRepository? _UnityTypesRep;
         public IIngredientRepository? _IngredientRep;
         public IProductIngredientsRepository? _ProductIngredientsRep;
+        public IComboRepository? _ComboRep;
+        public IFixedCoastRepository? _FixedCoastRep;
 
         public AppDbContext _context;
 
@@ -39,6 +41,14 @@ namespace SmartBurguerValueAPI.Repository
         public IProductIngredientsRepository ProductsIngredientRepository
         {
             get { return _ProductIngredientsRep = _ProductIngredientsRep ?? new ProductIngredientRepository(_context); }
+        }
+        public IComboRepository ComboRepository
+        {
+            get { return _ComboRep = _ComboRep ?? new ComboRepository(_context); }
+        }
+        public IFixedCoastRepository FixedCoastRepository
+        {
+            get { return _FixedCoastRep = _FixedCoastRep ?? new FixedCoastRepository(_context); }
         }
         public void Commit()
         {
