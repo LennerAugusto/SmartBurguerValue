@@ -1,4 +1,5 @@
-﻿using SmartBurguerValueAPI.IRepository.IProducts;
+﻿using SmartBurguerValueAPI.Interfaces.IProducts;
+using SmartBurguerValueAPI.IRepository.IProducts;
 
 namespace SmartBurguerValueAPI.Interfaces
 {
@@ -7,6 +8,8 @@ namespace SmartBurguerValueAPI.Interfaces
         IProductRepository ProductRepository { get; }
         IEnterpriseRepository EnterpriseRepository { get; }
         IUnityTypesRepository UnityTypesRepository { get; }
+        IIngredientRepository IngredientRepository { get; }
+        IProductIngredientsRepository ProductsIngredientRepository { get; }
         void Commit();
     }
 }

@@ -23,9 +23,9 @@ namespace SmartBurguerValueAPI.Controllers
         }
 
         [HttpGet("get-all")]
-        public async Task<ActionResult<IEnumerable<BaseDTO>>> GetAllProducts()
+        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetAllProductsByEnterprise(Guid EnterpriseId)
         {
-            var Products = await _unityOfWork.ProductRepository.GetAll();
+            var Products = await _unityOfWork.ProductRepository.GetAllProductsByEnterpriseId(EnterpriseId);
             return Ok(Products);
         }
 
@@ -37,18 +37,18 @@ namespace SmartBurguerValueAPI.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<ActionResult<ProductsDTO>> CreateProduct([FromBody] ProductsEntity Product)
+        public async Task<ActionResult<ProductDTO>> CreateProduct([FromBody] ProductDTO product)
         {
-            var UnityTypes = _unityOfWork.ProductRepository.Create(Product);
+            var Product = _unityOfWork.ProductRepository.CreateProductAsync(product);
             _unityOfWork.Commit();
-            return Ok(UnityTypes);
+            return Ok(Product);
         }
 
 
         [HttpPut("update/")]
-        public ActionResult Put([FromBody] ProductsEntity product)
+        public ActionResult Put([FromBody] ProductDTO product)
         {
-            var Product = _unityOfWork.ProductRepository.Update(product);
+            var Product = _unityOfWork.ProductRepository.UpdateProductAsync(product);
             _unityOfWork.Commit();
             return Ok(Product);
         }

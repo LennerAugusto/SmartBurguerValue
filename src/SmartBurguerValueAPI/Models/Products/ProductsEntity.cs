@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace SmartBurguerValueAPI.Models.Products
 {
@@ -11,7 +12,9 @@ namespace SmartBurguerValueAPI.Models.Products
         public string? ImageUrl { get; set; }
         public Guid EnterpriseId { get; set; }
         public EnterpriseEntity Enterprise { get; set; }
+        [JsonIgnore]
         public ICollection<ProductsIngredientsEntity> ProductIngredients { get; set; }
+        [JsonIgnore]
         public ICollection<ComboProduct> ComboProducts { get; set; }
     }
 }

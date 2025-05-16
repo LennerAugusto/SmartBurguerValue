@@ -1,5 +1,6 @@
 ﻿using SmartBurguerValueAPI.Context;
 using SmartBurguerValueAPI.Interfaces;
+using SmartBurguerValueAPI.Interfaces.IProducts;
 using SmartBurguerValueAPI.IRepository.IProducts;
 using SmartBurguerValueAPI.Repository.ProductsRepository;
 
@@ -9,7 +10,9 @@ namespace SmartBurguerValueAPI.Repository
     {
         public IProductRepository? _ProductRep;
         public IEnterpriseRepository? _EnterpriseRep;
-        public IUnityTypesRepository _UnityTypesRep;
+        public IUnityTypesRepository? _UnityTypesRep;
+        public IIngredientRepository? _IngredientRep;
+        public IProductIngredientsRepository? _ProductIngredientsRep;
 
         public AppDbContext _context;
 
@@ -29,6 +32,14 @@ namespace SmartBurguerValueAPI.Repository
         {
             get { return _UnityTypesRep = _UnityTypesRep ?? new UnityTypesProductsRepository(_context); }
         } 
+        public IIngredientRepository IngredientRepository
+        {
+            get { return _IngredientRep = _IngredientRep ?? new IngredientRepository(_context); }
+        }
+        public IProductIngredientsRepository ProductsIngredientRepository
+        {
+            get { return _ProductIngredientsRep = _ProductIngredientsRep ?? new ProductIngredientRepository(_context); }
+        }
         public void Commit()
         {
             _context.SaveChanges();

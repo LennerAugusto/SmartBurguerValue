@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using SmartBurguerValueAPI.Context;
 using SmartBurguerValueAPI.DTOs.Products;
-using SmartBurguerValueAPI.DTOs;
 using SmartBurguerValueAPI.Models.Products;
 using SmartBurguerValueAPI.IRepository.IProducts;
 using SmartBurguerValueAPI.Interfaces;

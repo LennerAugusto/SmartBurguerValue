@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
 using SmartBurguerValueAPI.Context;
 using SmartBurguerValueAPI.Interfaces;
+using SmartBurguerValueAPI.Interfaces.IProducts;
 using SmartBurguerValueAPI.IRepository.IProducts;
 using SmartBurguerValueAPI.IRepository.IRepositoryBase;
 
@@ -31,6 +32,7 @@ builder.Services.AddScoped(typeof(IRepositoryBase<>), typeof(RepositoryBase<>));
 builder.Services.AddScoped<IUnityTypesRepository, UnityTypesProductsRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IEnterpriseRepository, EnterpriseRepository>();
+builder.Services.AddScoped<IIngredientRepository, IngredientRepository>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
