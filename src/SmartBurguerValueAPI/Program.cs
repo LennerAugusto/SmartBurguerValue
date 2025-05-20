@@ -33,6 +33,7 @@ builder.Services.AddScoped<IUnityTypesRepository, UnityTypesProductsRepository>(
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IEnterpriseRepository, EnterpriseRepository>();
 builder.Services.AddScoped<IIngredientRepository, IngredientRepository>();
+builder.Services.AddScoped<ISalesGoalRepository, SalesGoalRepository>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 

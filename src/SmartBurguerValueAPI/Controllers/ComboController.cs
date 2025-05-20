@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using SmartBurguerValueAPI.Context;
 using SmartBurguerValueAPI.DTOs.Products;
 using SmartBurguerValueAPI.Interfaces;
+using SmartBurguerValueAPI.Pagination;
 
 namespace SmartBurguerValueAPI.Controllers
 {
@@ -18,9 +20,28 @@ namespace SmartBurguerValueAPI.Controllers
         }
 
         [HttpGet("get-all")]
-        public async Task<ActionResult<IEnumerable<ComboDTO>>> GetAllComboByEnterprise(Guid EnterpriseId)
+        public async Task<ActionResult<IEnumerable<ComboDTO>>> GetAllCombos()
         {
-            var Combos = await _unityOfWork.ComboRepository.GetAllCombosByEnterpriseId(EnterpriseId);
+            var Combos = await _unityOfWork.ComboRepository.GetAll();
+            return Ok(Combos);
+        }
+        [HttpGet("get-all/by-enterprise-id")]
+        public async Task<ActionResult<IEnumerable<ComboDTO>>> GetAllComboByEnterprise(PaginationParamiters paramiters, Guid EnterpriseId)
+        {
+            var Combos= await _unityOfWork.ComboRepository.GetAllCombosByEnterpriseId(paramiters, EnterpriseId);
+
+            var metadata = new
+            {
+                Combos.TotalCount,
+                Combos.PageSize,
+                Combos.CurrentPage,
+                Combos.TotalPages,
+                Combos.HasNext,
+                Combos.HasPrevius
+            };
+
+            Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
+
             return Ok(Combos);
         }
 

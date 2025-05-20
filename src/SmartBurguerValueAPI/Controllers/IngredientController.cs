@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using SmartBurguerValueAPI.Context;
 using SmartBurguerValueAPI.DTOs;
 using SmartBurguerValueAPI.DTOs.Products;
 using SmartBurguerValueAPI.Interfaces;
 using SmartBurguerValueAPI.Models;
 using SmartBurguerValueAPI.Models.Products;
+using SmartBurguerValueAPI.Pagination;
 
 namespace SmartBurguerValueAPI.Controllers
 {
@@ -26,9 +28,22 @@ namespace SmartBurguerValueAPI.Controllers
             return Ok(Ingredients);
         }
         [HttpGet("get-all/by-enterprise-id")]
-        public async Task<ActionResult<IEnumerable<IngredientDTO>>> GetAllIngredientsByEnterprise(Guid EnterpriseId)
+        public async Task<ActionResult<IEnumerable<IngredientDTO>>> GetAllIngredientByEnterpriseId(PaginationParamiters paramiters, Guid EnterpriseId)
         {
-            var Ingredients = await _unityOfWork.IngredientRepository.GetAllIngredientByEnterpriseId(EnterpriseId);
+            var Ingredients = await _unityOfWork.IngredientRepository.GetAllIngredientByEnterpriseId(paramiters, EnterpriseId);
+
+            var metadata = new
+            {
+                Ingredients.TotalCount,
+                Ingredients.PageSize,
+                Ingredients.CurrentPage,
+                Ingredients.TotalPages,
+                Ingredients.HasNext,
+                Ingredients.HasPrevius
+            };
+
+            Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
+
             return Ok(Ingredients);
         }
         [HttpGet("get-by-id/")]

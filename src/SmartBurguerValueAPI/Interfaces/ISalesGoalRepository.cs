@@ -5,8 +5,8 @@ using SmartBurguerValueAPI.Pagination;
 
 namespace SmartBurguerValueAPI.Interfaces
 {
-    public interface IFixedCoastRepository : IRepositoryBase<FixedCostEntity>
+    public interface ISalesGoalRepository : IRepositoryBase<SalesGoalEntity>
     {
-        Task<PagedList<FixedCoastDTO>> GetAllFixedCostByEnterpriseId(PaginationParamiters paramiters, Guid EnterpriseId);
+        Task<PagedList<SalesGoalDTO>> GetAllSalesGoalByEnterpriseId(PaginationParamiters paramiters, Guid EnterpriseId);
     }
 }

@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using SmartBurguerValueAPI.Context;
 using SmartBurguerValueAPI.DTOs;
+using SmartBurguerValueAPI.DTOs.Products;
 using SmartBurguerValueAPI.Interfaces;
 using SmartBurguerValueAPI.Migrations;
 using SmartBurguerValueAPI.Models;
+using SmartBurguerValueAPI.Pagination;
 
 namespace SmartBurguerValueAPI.Controllers
 {
@@ -25,9 +28,22 @@ namespace SmartBurguerValueAPI.Controllers
             return Ok(FixedCoasts);
         }
         [HttpGet("get-all/by-enterprise-id")]
-        public async Task<ActionResult<IEnumerable<FixedCoastDTO>>> GetAllFixedCoastByEnterpriseId(Guid enterpriseId)
+        public async Task<ActionResult<IEnumerable<FixedCoastDTO>>> GetAllFixedCoastByEnterpriseId(PaginationParamiters paramiters, Guid EnterpriseId)
         {
-            var FixedCoasts = await _unityOfWork.FixedCoastRepository.GetAllFixedCostByEnterpriseId(enterpriseId);
+            var FixedCoasts = await _unityOfWork.FixedCoastRepository.GetAllFixedCostByEnterpriseId(paramiters, EnterpriseId);
+
+            var metadata = new
+            {
+                FixedCoasts.TotalCount,
+                FixedCoasts.PageSize,
+                FixedCoasts.CurrentPage,
+                FixedCoasts.TotalPages,
+                FixedCoasts.HasNext,
+                FixedCoasts.HasPrevius
+            };
+
+            Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
+
             return Ok(FixedCoasts);
         }
         [HttpGet("get-by-id/")]

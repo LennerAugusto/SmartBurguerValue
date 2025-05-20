@@ -1,12 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Newtonsoft.Json;
 using SmartBurguerValueAPI.Context;
 using SmartBurguerValueAPI.DTOs;
 using SmartBurguerValueAPI.DTOs.Products;
 using SmartBurguerValueAPI.Interfaces;
 using SmartBurguerValueAPI.IRepository.IProducts;
 using SmartBurguerValueAPI.Models.Products;
+using SmartBurguerValueAPI.Pagination;
 
 namespace SmartBurguerValueAPI.Controllers
 {
@@ -22,10 +24,23 @@ namespace SmartBurguerValueAPI.Controllers
             _unityOfWork = unityOfWork;
         }
 
-        [HttpGet("get-all")]
-        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetAllProductsByEnterprise(Guid EnterpriseId)
+        [HttpGet("get-all/by-enterprise-id")]
+        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetAllProductsByEnterprise(PaginationParamiters paramiters, Guid EnterpriseId)
         {
-            var Products = await _unityOfWork.ProductRepository.GetAllProductsByEnterpriseId(EnterpriseId);
+            var Products = await _unityOfWork.ProductRepository.GetAllProductsByEnterpriseId(paramiters, EnterpriseId);
+
+            var metadata = new
+            {
+                Products.TotalCount,
+                Products.PageSize,
+                Products.CurrentPage,
+                Products.TotalPages,
+                Products.HasNext,
+                Products.HasPrevius
+            };
+
+            Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
+
             return Ok(Products);
         }
 

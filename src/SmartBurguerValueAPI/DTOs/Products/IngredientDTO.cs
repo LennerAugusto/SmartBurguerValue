@@ -5,6 +5,7 @@ namespace SmartBurguerValueAPI.DTOs.Products
 {
     public class IngredientDTO
     {
+        public Guid Id { get; set; }
         public string Name { get; set; }
         public decimal PurchaseQuantity { get; set; }
         public Guid UnitOfMeasureId { get; set; }

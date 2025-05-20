@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using SmartBurguerValueAPI.Context;
@@ -7,6 +8,7 @@ using SmartBurguerValueAPI.Interfaces;
 using SmartBurguerValueAPI.Interfaces.IProducts;
 using SmartBurguerValueAPI.IRepository.IProducts;
 using SmartBurguerValueAPI.Models.Products;
+using SmartBurguerValueAPI.Pagination;
 using SmartBurguerValueAPI.Repository.Base;
 
 namespace SmartBurguerValueAPI.Repository.ProductsRepository
@@ -19,12 +21,22 @@ namespace SmartBurguerValueAPI.Repository.ProductsRepository
         public ProductRepository(AppDbContext context) : base(context)
         {
         }
-        public async Task<IEnumerable<ProductDTO>> GetAllProductsByEnterpriseId(Guid enterpriseId)
+        public async Task<PagedList<ProductDTO>> GetAllProductsByEnterpriseId(PaginationParamiters paramiters, Guid enterpriseId)
         {
-            return await _context.Set<ProductDTO>()
+            var query = _context.Products
                 .Where(x => x.EnterpriseId == enterpriseId)
-                .AsNoTracking().ToListAsync();
+                .OrderBy(x => x.Id)
+                .Select(x => new ProductDTO
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Description = x.Description,
+                });
+
+            var productsOrder =  PagedList<ProductDTO>.ToPagedList(query, paramiters.PageNumber, paramiters.PageSize);
+            return productsOrder;
         }
+
         public async Task<Guid> CreateProductAsync(ProductDTO dto)
         {
             var product = new ProductsEntity

@@ -15,6 +15,7 @@ namespace SmartBurguerValueAPI.Repository
         public IProductIngredientsRepository? _ProductIngredientsRep;
         public IComboRepository? _ComboRep;
         public IFixedCoastRepository? _FixedCoastRep;
+        public ISalesGoalRepository _SalesGoalRep;
 
         public AppDbContext _context;
 
@@ -49,6 +50,10 @@ namespace SmartBurguerValueAPI.Repository
         public IFixedCoastRepository FixedCoastRepository
         {
             get { return _FixedCoastRep = _FixedCoastRep ?? new FixedCoastRepository(_context); }
+        }
+        public ISalesGoalRepository SalesGoalRepository
+        {
+            get { return _SalesGoalRep = _SalesGoalRep ?? new SalesGoalRepository(_context); }
         }
         public void Commit()
         {

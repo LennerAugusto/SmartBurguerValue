@@ -12,6 +12,7 @@ namespace SmartBurguerValueAPI.Interfaces
         IProductIngredientsRepository ProductsIngredientRepository { get; }
         IComboRepository ComboRepository { get; }
         IFixedCoastRepository FixedCoastRepository { get; }
+        ISalesGoalRepository SalesGoalRepository { get; }
         void Commit();
     }
 }

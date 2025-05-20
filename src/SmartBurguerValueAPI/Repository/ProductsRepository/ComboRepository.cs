@@ -4,6 +4,7 @@ using SmartBurguerValueAPI.DTOs.Products;
 using SmartBurguerValueAPI.Interfaces.IProducts;
 using SmartBurguerValueAPI.IRepository.IProducts;
 using SmartBurguerValueAPI.Models.Products;
+using SmartBurguerValueAPI.Pagination;
 using SmartBurguerValueAPI.Repository.Base;
 
 namespace SmartBurguerValueAPI.Repository.ProductsRepository
@@ -17,9 +18,9 @@ namespace SmartBurguerValueAPI.Repository.ProductsRepository
         public ComboRepository(AppDbContext context) : base(context)
         {
         }
-        public async Task<IEnumerable<ComboDTO>> GetAllCombosByEnterpriseId(Guid enterpriseId)
+        public async Task<PagedList<ComboDTO>> GetAllCombosByEnterpriseId(PaginationParamiters paramiters, Guid enterpriseId)
         {
-            return await _context.Set<ComboEntity>()
+            var query = _context.Set<ComboEntity>()
                 .Where(x => x.EnterpriseId == enterpriseId)
                 .Include(x => x.ComboProducts)
                     .ThenInclude(cp => cp.Product)
@@ -34,9 +35,11 @@ namespace SmartBurguerValueAPI.Repository.ProductsRepository
                         Id = cp.Product.Id,
                         Name = cp.Product.Name,
                     }).ToList()
-                })
-                .ToListAsync();
+                });
+
+            return PagedList<ComboDTO>.ToPagedList(query, paramiters.PageNumber, paramiters.PageSize);
         }
+
         public async Task<Guid> CreateComboAsync(ComboDTO dto)
         {
             var combo = new ComboEntity
