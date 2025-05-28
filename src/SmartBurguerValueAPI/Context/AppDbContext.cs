@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using SmartBurguerValueAPI.Models;
 using SmartBurguerValueAPI.Models.Products;
 
 namespace SmartBurguerValueAPI.Context
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext<ApplicationUser>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
@@ -50,5 +51,6 @@ namespace SmartBurguerValueAPI.Context
                 .WithMany(p => p.ComboProducts)
                 .HasForeignKey(cp => cp.ProductId);
         }
+
     }
 }

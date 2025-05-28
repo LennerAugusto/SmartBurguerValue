@@ -55,9 +55,9 @@ namespace SmartBurguerValueAPI.Repository
         {
             get { return _SalesGoalRep = _SalesGoalRep ?? new SalesGoalRepository(_context); }
         }
-        public void Commit()
+        public async Task CommitAsync()
         {
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
         public void Dispose()
         {

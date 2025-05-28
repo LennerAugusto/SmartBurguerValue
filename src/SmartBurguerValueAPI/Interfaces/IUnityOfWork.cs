@@ -13,6 +13,6 @@ namespace SmartBurguerValueAPI.Interfaces
         IComboRepository ComboRepository { get; }
         IFixedCoastRepository FixedCoastRepository { get; }
         ISalesGoalRepository SalesGoalRepository { get; }
-        void Commit();
+        Task CommitAsync();
     }
 }

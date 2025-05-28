@@ -23,7 +23,7 @@ namespace SmartBurguerValueAPI.Controllers
         [HttpGet("get-all")]
         public async Task<ActionResult<IEnumerable<SalesGoalDTO>>> GetAllSalesGoal()
         {
-            var SalesGoals = await _unityOfWork.SalesGoalRepository.GetAll();
+            var SalesGoals = await _unityOfWork.SalesGoalRepository.GetAllAsync();
             return Ok(SalesGoals);
         }
         [HttpGet("get-all/by-enterprise-id")]
@@ -49,7 +49,7 @@ namespace SmartBurguerValueAPI.Controllers
         [HttpGet("get-by-id/")]
         public async Task<IActionResult> GetSalesGoalById(Guid salesGoalId)
         {
-            var SalesGoal = _unityOfWork.SalesGoalRepository.GetById(salesGoalId);
+            var SalesGoal = _unityOfWork.SalesGoalRepository.GetByIdAsync(salesGoalId);
             return Ok(SalesGoal);
         }
 
@@ -57,7 +57,7 @@ namespace SmartBurguerValueAPI.Controllers
         public async Task<ActionResult<SalesGoalDTO>> CreateSalesGoal([FromBody] SalesGoalEntity salesGoal)
         {
             var SalesGoal = _unityOfWork.SalesGoalRepository.Create(salesGoal);
-            _unityOfWork.Commit();
+            await _unityOfWork.CommitAsync();
             return Ok(SalesGoal);
         }
 
@@ -66,17 +66,17 @@ namespace SmartBurguerValueAPI.Controllers
         public ActionResult Put([FromBody] SalesGoalEntity combo)
         {
             var SalesGoal = _unityOfWork.SalesGoalRepository.Create(combo);
-            _unityOfWork.Commit();
+            _unityOfWork.CommitAsync();
             return Ok(SalesGoal);
         }
 
         [HttpDelete("delete/{id:guid}")]
         public async Task<ActionResult> Delete(Guid id)
         {
-            var SalesGoal = await _unityOfWork.SalesGoalRepository.GetById(id);
+            var SalesGoal = await _unityOfWork.SalesGoalRepository.GetByIdAsync(id);
 
             await _unityOfWork.SalesGoalRepository.Delete(SalesGoal);
-            _unityOfWork.Commit();
+            await _unityOfWork.CommitAsync();
             return Ok(SalesGoal);
         }
     }

@@ -53,7 +53,7 @@ namespace SmartBurguerValueAPI.Repository.ProductsRepository
 
             foreach (var item in dto.Ingredients)
             {
-                var ingredient = await _ingredientRepository.GetById(item.IngredientId);
+                var ingredient = await _ingredientRepository.GetByIdAsync(item.IngredientId);
                 if (ingredient == null)
                     throw new Exception($"Ingredient not found: {item.IngredientId}");
 
@@ -77,7 +77,7 @@ namespace SmartBurguerValueAPI.Repository.ProductsRepository
         }
         public async Task UpdateProductAsync(ProductDTO dto)
         {
-            var product = await _productRepository.GetById(dto.Id);
+            var product = await _productRepository.GetByIdAsync(dto.Id);
             if (product == null)
                 throw new Exception("Product not found");
 
@@ -90,10 +90,9 @@ namespace SmartBurguerValueAPI.Repository.ProductsRepository
 
             await _productIngredientsRepository.RemoveAllByProductIdAsync(product.Id);
 
-            // Add updated ingredients
             foreach (var item in dto.Ingredients)
             {
-                var ingredient = await _ingredientRepository.GetById(item.IngredientId);
+                var ingredient = await _ingredientRepository.GetByIdAsync(item.IngredientId);
                 if (ingredient == null)
                     throw new Exception($"Ingredient not found: {item.IngredientId}");
 

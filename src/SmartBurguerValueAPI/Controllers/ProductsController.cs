@@ -47,7 +47,7 @@ namespace SmartBurguerValueAPI.Controllers
         [HttpGet("get-by-id/")]
         public async Task<IActionResult> GetProductById(Guid ProductId)
         {
-            var Products = _unityOfWork.ProductRepository.GetById(ProductId);
+            var Products = _unityOfWork.ProductRepository.GetByIdAsync(ProductId);
             return Ok(Products);
         }
 
@@ -55,7 +55,7 @@ namespace SmartBurguerValueAPI.Controllers
         public async Task<ActionResult<ProductDTO>> CreateProduct([FromBody] ProductDTO product)
         {
             var Product = _unityOfWork.ProductRepository.CreateProductAsync(product);
-            _unityOfWork.Commit();
+            await _unityOfWork.CommitAsync();
             return Ok(Product);
         }
 
@@ -64,17 +64,17 @@ namespace SmartBurguerValueAPI.Controllers
         public ActionResult Put([FromBody] ProductDTO product)
         {
             var Product = _unityOfWork.ProductRepository.UpdateProductAsync(product);
-            _unityOfWork.Commit();
+            _unityOfWork.CommitAsync();
             return Ok(Product);
         }
 
         [HttpDelete("delete/{id:guid}")]
         public async Task<ActionResult> Delete(Guid id)
         {
-            var Product = await _unityOfWork.ProductRepository.GetById(id);
+            var Product = await _unityOfWork.ProductRepository.GetByIdAsync(id);
 
             await _unityOfWork.ProductRepository.Delete(Product);
-            _unityOfWork.Commit();
+            await _unityOfWork.CommitAsync();
             return Ok(Product);
         }
     }

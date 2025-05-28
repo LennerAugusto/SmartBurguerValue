@@ -24,7 +24,7 @@ namespace SmartBurguerValueAPI.Controllers
         [HttpGet("get-all")]
         public async Task<ActionResult<IEnumerable<IngredientDTO>>> GetAllIngredients()
         {
-            var Ingredients = await _unityOfWork.IngredientRepository.GetAll();
+            var Ingredients = await _unityOfWork.IngredientRepository.GetAllAsync();
             return Ok(Ingredients);
         }
         [HttpGet("get-all/by-enterprise-id")]
@@ -49,7 +49,7 @@ namespace SmartBurguerValueAPI.Controllers
         [HttpGet("get-by-id/")]
         public async Task<IActionResult> GetIngredientById(Guid IngredientId)
         {
-            var Ingredient = _unityOfWork.IngredientRepository.GetById(IngredientId);
+            var Ingredient = _unityOfWork.IngredientRepository.GetByIdAsync(IngredientId);
             return Ok(Ingredient);
         }
 
@@ -57,7 +57,7 @@ namespace SmartBurguerValueAPI.Controllers
         public async Task<ActionResult<IngredientDTO>> CreateIngredient([FromBody] IngredientsEntity ingredient)
         {
             var Ingredient = _unityOfWork.IngredientRepository.Create(ingredient);
-            _unityOfWork.Commit();
+            await _unityOfWork.CommitAsync();
             return Ok(Ingredient);
         }
 
@@ -66,17 +66,17 @@ namespace SmartBurguerValueAPI.Controllers
         public ActionResult Put([FromBody] IngredientsEntity ingredient)
         {
             var Ingredient = _unityOfWork.IngredientRepository.Update(ingredient);
-            _unityOfWork.Commit();
+            _unityOfWork.CommitAsync();
             return Ok(Ingredient);
         }
 
         [HttpDelete("delete/{id:guid}")]
         public async Task<ActionResult> Delete(Guid id)
         {
-            var Ingredient = await _unityOfWork.IngredientRepository.GetById(id);
+            var Ingredient = await _unityOfWork.IngredientRepository.GetByIdAsync(id);
 
             await _unityOfWork.IngredientRepository.Delete(Ingredient);
-            _unityOfWork.Commit();
+            await _unityOfWork.CommitAsync();
             return Ok(Ingredient);
         }
     }

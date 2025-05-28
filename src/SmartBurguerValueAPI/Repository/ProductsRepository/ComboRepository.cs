@@ -18,9 +18,9 @@ namespace SmartBurguerValueAPI.Repository.ProductsRepository
         public ComboRepository(AppDbContext context) : base(context)
         {
         }
-        public async Task<PagedList<ComboDTO>> GetAllCombosByEnterpriseId(PaginationParamiters paramiters, Guid enterpriseId)
+        public async Task<PagedList<ComboDTO>> GetAllCombosByEnterpriseIdAsync(PaginationParamiters paramiters, Guid enterpriseId)
         {
-            var query = _context.Set<ComboEntity>()
+            var query =  _context.Set<ComboEntity>()
                 .Where(x => x.EnterpriseId == enterpriseId)
                 .Include(x => x.ComboProducts)
                     .ThenInclude(cp => cp.Product)
@@ -55,7 +55,7 @@ namespace SmartBurguerValueAPI.Repository.ProductsRepository
 
             foreach (var item in dto.Products)
             {
-                var product = await _productRepository.GetById(item.Id);
+                var product = await _productRepository.GetByIdAsync(item.Id);
                 if (product == null)
                     throw new Exception($"Product not found: {item.Id}");
 
@@ -75,7 +75,7 @@ namespace SmartBurguerValueAPI.Repository.ProductsRepository
         }
         public async Task UpdateComboAsync(ComboDTO dto)
         {
-            var combo = await _comboRepository.GetById(dto.Id);
+            var combo = await _comboRepository.GetByIdAsync(dto.Id);
             if (combo == null)
                 throw new Exception("Combo not found");
 
@@ -89,7 +89,7 @@ namespace SmartBurguerValueAPI.Repository.ProductsRepository
 
             foreach (var item in dto.Products)
             {
-                var products = await _productRepository.GetById(item.Id);
+                var products = await _productRepository.GetByIdAsync(item.Id);
                 if (products == null)
                     throw new Exception($"Products not found: {item.Id}");
 

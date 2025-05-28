@@ -23,14 +23,14 @@ namespace SmartBurguerValueAPI.Controllers
         [HttpGet("get-all")]
         public async Task<ActionResult<IEnumerable<EnterpriseDTO>>> GetAllEnterprises()
         {
-            var Enterprises = await _unityOfWork.EnterpriseRepository.GetAll();
+            var Enterprises = await _unityOfWork.EnterpriseRepository.GetAllAsync();
             return Ok(Enterprises);
         }
 
         [HttpGet("get-by-id/")]
         public async Task<IActionResult> GetEnterpriseById(Guid EnterpriseId)
         {
-            var Enterprise = _unityOfWork.EnterpriseRepository.GetById(EnterpriseId);
+            var Enterprise = _unityOfWork.EnterpriseRepository.GetByIdAsync(EnterpriseId);
             return Ok(Enterprise);
         }
 
@@ -38,7 +38,7 @@ namespace SmartBurguerValueAPI.Controllers
         public async Task<ActionResult<EnterpriseDTO>> CreateEnterprise([FromBody] EnterpriseEntity enterprise)
         {
             var Enterprise = _unityOfWork.EnterpriseRepository.Create(enterprise);
-            _unityOfWork.Commit();
+            await _unityOfWork.CommitAsync();
             return Ok(Enterprise);
         }
 
@@ -47,17 +47,17 @@ namespace SmartBurguerValueAPI.Controllers
         public ActionResult Put([FromBody] EnterpriseEntity enterprise)
         {
             var Enterprise = _unityOfWork.EnterpriseRepository.Update(enterprise);
-            _unityOfWork.Commit();
+            _unityOfWork.CommitAsync();
             return Ok(Enterprise);
         }
 
         [HttpDelete("delete/{id:guid}")]
         public async Task<ActionResult> Delete(Guid id)
         {
-            var Enterprise = await _unityOfWork.EnterpriseRepository.GetById(id);
+            var Enterprise = await _unityOfWork.EnterpriseRepository.GetByIdAsync(id);
 
             await _unityOfWork.EnterpriseRepository.Delete(Enterprise);
-            _unityOfWork.Commit();
+            await _unityOfWork.CommitAsync();
             return Ok(Enterprise);
         }
     }

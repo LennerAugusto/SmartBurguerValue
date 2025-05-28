@@ -24,14 +24,14 @@ namespace SmartBurguerValueAPI.Controllers
         [HttpGet("get-all")]
         public async Task<ActionResult<IEnumerable<UnityTypesDTO>>> GetAllUnityTypes()
         {
-            var UnityTypes = await _unityOfWork.UnityTypesRepository.GetAll();
+            var UnityTypes = await _unityOfWork.UnityTypesRepository.GetAllAsync();
             return Ok(UnityTypes);
         }
 
         [HttpGet("get-by-id/")]
         public async Task<IActionResult> GetUnityTypeById(Guid unityTypeId)
         {
-            var UnityTypes = await _unityOfWork.UnityTypesRepository.GetById(unityTypeId);
+            var UnityTypes = await _unityOfWork.UnityTypesRepository.GetByIdAsync(unityTypeId);
             return Ok(UnityTypes);
         }
 
@@ -39,7 +39,7 @@ namespace SmartBurguerValueAPI.Controllers
         public async Task<ActionResult<UnityTypesDTO>> CreateUnityType([FromBody] UnityTypesProductsEntity unityType)
         {
             var UnityType =  _unityOfWork.UnityTypesRepository.Create(unityType);
-            _unityOfWork.Commit();
+            await _unityOfWork.CommitAsync();
             return Ok(UnityType);
         }
 
@@ -48,20 +48,20 @@ namespace SmartBurguerValueAPI.Controllers
         public ActionResult Put([FromBody]UnityTypesProductsEntity unityType)
         {
             var UnityType = _unityOfWork.UnityTypesRepository.Update(unityType);
-            _unityOfWork.Commit();
+            _unityOfWork.CommitAsync();
             return Ok(UnityType);
         }
 
         [HttpDelete("delete/{id:guid}")]
         public async Task<ActionResult> Delete(Guid id)
         {
-            var Entity = await _unityOfWork.UnityTypesRepository.GetById(id);
+            var Entity = await _unityOfWork.UnityTypesRepository.GetByIdAsync(id);
             
             if (Entity == null)
                 return NotFound();
             
             await _unityOfWork.UnityTypesRepository.Delete(Entity);
-            _unityOfWork.Commit();
+            await _unityOfWork.CommitAsync();
             return Ok(Entity);
         }
     }

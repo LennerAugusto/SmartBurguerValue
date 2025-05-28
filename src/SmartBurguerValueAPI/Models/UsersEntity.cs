@@ -3,7 +3,7 @@
 //namespace SmartBurguerValueAPI.Models
 //{
 //    [Table("Users")]
-//    public class UsersEntity :BaseEntity
+//    public class UsersEntity : BaseEntity
 //    {
 //        public string Name { get; set; }
 //        public string Email { get; set; }

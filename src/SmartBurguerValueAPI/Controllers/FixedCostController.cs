@@ -24,7 +24,7 @@ namespace SmartBurguerValueAPI.Controllers
         [HttpGet("get-all")]
         public async Task<ActionResult<IEnumerable<FixedCoastDTO>>> GetAllFixedCoasts()
         {
-            var FixedCoasts = await _unityOfWork.FixedCoastRepository.GetAll();
+            var FixedCoasts = await _unityOfWork.FixedCoastRepository.GetAllAsync();
             return Ok(FixedCoasts);
         }
         [HttpGet("get-all/by-enterprise-id")]
@@ -49,7 +49,7 @@ namespace SmartBurguerValueAPI.Controllers
         [HttpGet("get-by-id/")]
         public async Task<IActionResult> GetFixedCoastById(Guid FixedCoastId)
         {
-            var FixedCoast = _unityOfWork.FixedCoastRepository.GetById(FixedCoastId);
+            var FixedCoast = _unityOfWork.FixedCoastRepository.GetByIdAsync(FixedCoastId);
             return Ok(FixedCoast);
         }
         
@@ -57,7 +57,7 @@ namespace SmartBurguerValueAPI.Controllers
         public async Task<ActionResult<FixedCoastDTO>> CreateFixedCoast([FromBody] FixedCostEntity fixedCoast)
         {
             var FixedCoast = _unityOfWork.FixedCoastRepository.Create(fixedCoast);
-            _unityOfWork.Commit();
+            await _unityOfWork.CommitAsync();
             return Ok(FixedCoast);
         }
 
@@ -66,17 +66,17 @@ namespace SmartBurguerValueAPI.Controllers
         public ActionResult Put([FromBody] FixedCostEntity fixedCoast)
         {
             var FixedCoast = _unityOfWork.FixedCoastRepository.Update(fixedCoast);
-            _unityOfWork.Commit();
+            _unityOfWork.CommitAsync();
             return Ok(FixedCoast);
         }
 
         [HttpDelete("delete/{id:guid}")]
         public async Task<ActionResult> Delete(Guid id)
         {
-            var FixedCoast = await _unityOfWork.FixedCoastRepository.GetById(id);
+            var FixedCoast = await _unityOfWork.FixedCoastRepository.GetByIdAsync(id);
 
             await _unityOfWork.FixedCoastRepository.Delete(FixedCoast);
-            _unityOfWork.Commit();
+            await _unityOfWork.CommitAsync();
             return Ok(FixedCoast);
         }
     }

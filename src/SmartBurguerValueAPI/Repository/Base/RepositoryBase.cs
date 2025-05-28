@@ -25,23 +25,26 @@ namespace SmartBurguerValueAPI.Repository.Base
         {
             _context.Set<T>().Remove(entity);
         }
-        public async Task<IEnumerable<T>> GetAll()
+        public async Task<IEnumerable<T>> GetAllAsync()
         {
             return await _context.Set<T>().AsNoTracking().ToListAsync();
         }
 
 
-        public IEnumerable<T> GetAll(bool? isActive = null)
+        public async Task<IEnumerable<T>> GetAllAsync(bool? isActive = null)
         {
             var query = _context.Set<T>().AsQueryable();
+
             if (isActive != null)
             {
-                query = query.Where(x => x.IsActive == isActive);
+                query = query.Where(x => EF.Property<bool>(x, "IsActive") == isActive);
             }
-            return query;
+
+            return await query.ToListAsync();
         }
 
-        public async Task<T> GetById(Guid id)
+
+        public async Task<T> GetByIdAsync(Guid id)
         {
             return await _context.Set<T>().FirstOrDefaultAsync(x => x.Id == id);
         }
