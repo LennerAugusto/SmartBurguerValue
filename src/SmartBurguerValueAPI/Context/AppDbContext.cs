@@ -22,7 +22,7 @@ namespace SmartBurguerValueAPI.Context
         public DbSet<ComboProductEntity> ComboProducts { get; set; }
         public DbSet<FixedCostEntity> FixedCosts{ get; set; }
         public DbSet <SalesGoalEntity> SalesGoal{ get; set; }
-
+        public DbSet <DailyEntryEntity> DailyEntry { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

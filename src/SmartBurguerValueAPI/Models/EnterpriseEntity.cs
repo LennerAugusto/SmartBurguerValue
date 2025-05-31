@@ -17,7 +17,7 @@ namespace SmartBurguerValueAPI.Models
         public string? Number { get; set; }
         public string? CEP { get; set; }
         public string? Plan { get; set; }
-        //public ICollection<UsersEntity> Users { get; set; }
+
         [JsonIgnore]
         public ICollection<IngredientsEntity> Ingredients { get; set; }
         [JsonIgnore]
@@ -26,5 +26,7 @@ namespace SmartBurguerValueAPI.Models
         public ICollection<ComboEntity> Combos { get; set; }
         [JsonIgnore]
         public ICollection<FixedCostEntity> FixedCosts { get; set; }
+        [JsonIgnore]
+        public ICollection<DailyEntryEntity> DailyEntry { get; set; }
     }
 }

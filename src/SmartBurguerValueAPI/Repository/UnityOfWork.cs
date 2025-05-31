@@ -16,6 +16,9 @@ namespace SmartBurguerValueAPI.Repository
         public IComboRepository? _ComboRep;
         public IFixedCoastRepository? _FixedCoastRep;
         public ISalesGoalRepository _SalesGoalRep;
+        public IDailyEntryRepository _DailyEntryRep;
+        public IEmployeeRepository _EmployeeRep;
+        public IEmployeeWorkScheduleRepository _EmployeeWorkRep;
 
         public AppDbContext _context;
 
@@ -54,6 +57,18 @@ namespace SmartBurguerValueAPI.Repository
         public ISalesGoalRepository SalesGoalRepository
         {
             get { return _SalesGoalRep = _SalesGoalRep ?? new SalesGoalRepository(_context); }
+        }
+        public IDailyEntryRepository DailyEntryRepository
+        {
+            get { return _DailyEntryRep = _DailyEntryRep ?? new DailyEntryRepository(_context); }
+        }
+        public IEmployeeRepository EmployeeRepository
+        {
+            get { return _EmployeeRep = _EmployeeRep ?? new EmployeeRepository(_context); }
+        }
+        public IEmployeeWorkScheduleRepository EmployeeWorkScheduleRepository
+        {
+            get { return _EmployeeWorkRep = _EmployeeWorkRep ?? new EmployeeWorkScheduleRepository(_context); }
         }
         public async Task CommitAsync()
         {
