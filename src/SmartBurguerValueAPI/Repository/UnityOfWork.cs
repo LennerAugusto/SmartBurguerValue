@@ -19,6 +19,7 @@ namespace SmartBurguerValueAPI.Repository
         public IDailyEntryRepository _DailyEntryRep;
         public IEmployeeRepository _EmployeeRep;
         public IEmployeeWorkScheduleRepository _EmployeeWorkRep;
+        public IPurchaseRepository _PurchaseRep;
 
         public AppDbContext _context;
 
@@ -69,6 +70,10 @@ namespace SmartBurguerValueAPI.Repository
         public IEmployeeWorkScheduleRepository EmployeeWorkScheduleRepository
         {
             get { return _EmployeeWorkRep = _EmployeeWorkRep ?? new EmployeeWorkScheduleRepository(_context); }
+        }
+        public IPurchaseRepository PurchaseRepository
+        {
+            get { return _PurchaseRep = _PurchaseRep ?? new PurchaseRepository(_context); }
         }
         public async Task CommitAsync()
         {

@@ -23,6 +23,12 @@ namespace SmartBurguerValueAPI.Context
         public DbSet<FixedCostEntity> FixedCosts{ get; set; }
         public DbSet <SalesGoalEntity> SalesGoal{ get; set; }
         public DbSet <DailyEntryEntity> DailyEntry { get; set; }
+        public DbSet <EmployeeEntity> Employees { get; set; }
+        public DbSet <EmployeeWorkScheduleEntity> EmployeesWorkSchedule{get; set;}
+        public DbSet <PurchaseEntity> Purchase{get; set;}
+        public DbSet <PurchaseItemEntity> PurchaseItem{get; set;}
+        public DbSet <InventoryItemEntity> InventoryItem{get; set;}
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartBurguerValueAPI.Context;
 
@@ -11,9 +12,11 @@ using SmartBurguerValueAPI.Context;
 namespace SmartBurguerValueAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class SmartBurguerValueAPIContextModelSnapshot : ModelSnapshot
+    [Migration("20250604013318_create-purhcase-purchase-item-and-table-inventory")]
+    partial class createpurhcasepurchaseitemandtableinventory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -427,9 +430,6 @@ namespace SmartBurguerValueAPI.Migrations
                     b.Property<DateTime>("DateUpdated")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<Guid>("EnterpriseId")
-                        .HasColumnType("char(36)");
-
                     b.Property<Guid>("IngredientId")
                         .HasColumnType("char(36)");
 
@@ -683,9 +683,6 @@ namespace SmartBurguerValueAPI.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<DateTime>("PurchaseDate")
-                        .HasColumnType("datetime(6)");
-
                     b.Property<string>("SupplierName")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -718,10 +715,6 @@ namespace SmartBurguerValueAPI.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<string>("NameItem")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<Guid>("PurchaseId")
                         .HasColumnType("char(36)");
 
@@ -731,16 +724,11 @@ namespace SmartBurguerValueAPI.Migrations
                     b.Property<decimal>("UnitPrice")
                         .HasColumnType("decimal(65,30)");
 
-                    b.Property<Guid>("UnityOfMensureId")
-                        .HasColumnType("char(36)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("InventoryItemId");
 
                     b.HasIndex("PurchaseId");
-
-                    b.HasIndex("UnityOfMensureId");
 
                     b.ToTable("PurchaseItem");
                 });
@@ -981,17 +969,9 @@ namespace SmartBurguerValueAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SmartBurguerValueAPI.Models.Products.UnityTypesProductsEntity", "UnityOfMensure")
-                        .WithMany()
-                        .HasForeignKey("UnityOfMensureId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("InventoryItem");
 
                     b.Navigation("Purchase");
-
-                    b.Navigation("UnityOfMensure");
                 });
 
             modelBuilder.Entity("SmartBurguerValueAPI.Models.EmployeeEntity", b =>

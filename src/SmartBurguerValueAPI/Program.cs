@@ -74,6 +74,7 @@ builder.Services.AddScoped<ISalesGoalRepository, SalesGoalRepository>();
 builder.Services.AddScoped<IDailyEntryRepository, DailyEntryRepository>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IEmployeeWorkScheduleRepository, EmployeeWorkScheduleRepository>();
+builder.Services.AddScoped<IPurchaseRepository, PurchaseRepository>();
 
 //Mapeamento Serviços
 builder.Services.AddScoped<ITokenService, TokenService>();

@@ -16,6 +16,7 @@ namespace SmartBurguerValueAPI.Interfaces
         IDailyEntryRepository DailyEntryRepository { get; }
         IEmployeeRepository EmployeeRepository { get; }
         IEmployeeWorkScheduleRepository EmployeeWorkScheduleRepository { get; }
+        IPurchaseRepository PurchaseRepository { get; }
         Task CommitAsync();
     }
 }

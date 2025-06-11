@@ -56,7 +56,7 @@ namespace SmartBurguerValueAPI.Controllers
         [HttpPost("create")]
         public async Task<ActionResult<IngredientDTO>> CreateIngredient([FromBody] IngredientsEntity ingredient)
         {
-            var Ingredient = _unityOfWork.IngredientRepository.Create(ingredient);
+            var Ingredient = _unityOfWork.IngredientRepository.CreateIngredient(ingredient);
             await _unityOfWork.CommitAsync();
             return Ok(Ingredient);
         }
