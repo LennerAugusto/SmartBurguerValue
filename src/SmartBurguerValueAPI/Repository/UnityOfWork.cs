@@ -17,9 +17,12 @@ namespace SmartBurguerValueAPI.Repository
         public IFixedCoastRepository? _FixedCoastRep;
         public ISalesGoalRepository _SalesGoalRep;
         public IDailyEntryRepository _DailyEntryRep;
+        public IDailyEntryItemRepository _DailyEntryItemRep;
         public IEmployeeRepository _EmployeeRep;
         public IEmployeeWorkScheduleRepository _EmployeeWorkRep;
         public IPurchaseRepository _PurchaseRep;
+        public IFinancialSnapshotsRepository _FinancialSnapshotsRep;
+        public IProductCostAnalysisRepository _ProductCostAnalysisRep;
 
         public AppDbContext _context;
 
@@ -63,6 +66,10 @@ namespace SmartBurguerValueAPI.Repository
         {
             get { return _DailyEntryRep = _DailyEntryRep ?? new DailyEntryRepository(_context); }
         }
+        public IDailyEntryItemRepository DailyEntryItemRepository
+        {
+            get { return _DailyEntryItemRep = _DailyEntryItemRep ?? new DailyEntryItemRepository(_context); }
+        }
         public IEmployeeRepository EmployeeRepository
         {
             get { return _EmployeeRep = _EmployeeRep ?? new EmployeeRepository(_context); }
@@ -74,6 +81,14 @@ namespace SmartBurguerValueAPI.Repository
         public IPurchaseRepository PurchaseRepository
         {
             get { return _PurchaseRep = _PurchaseRep ?? new PurchaseRepository(_context); }
+        }
+        public IFinancialSnapshotsRepository FinancialSnapshotsRepository
+        {
+            get { return _FinancialSnapshotsRep = _FinancialSnapshotsRep ?? new FinancialSnapshotsRepository(_context); }
+        }
+        public IProductCostAnalysisRepository ProductCostAnalysisRepository
+        {
+            get { return _ProductCostAnalysisRep = _ProductCostAnalysisRep ?? new ProductCostAnalysisRepository(_context); }
         }
         public async Task CommitAsync()
         {

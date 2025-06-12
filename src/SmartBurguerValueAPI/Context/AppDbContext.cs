@@ -28,6 +28,9 @@ namespace SmartBurguerValueAPI.Context
         public DbSet <PurchaseEntity> Purchase{get; set;}
         public DbSet <PurchaseItemEntity> PurchaseItem{get; set;}
         public DbSet <InventoryItemEntity> InventoryItem{get; set;}
+        public DbSet <DailyEntryItemEntity> DailyEntryItem{get; set;}
+        public DbSet <ProductCostAnalysisEntity> ProductCostAnalysis {get; set;}
+        public DbSet <FinancialSnapshotEntity> FinancialSnapshots {get; set;}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

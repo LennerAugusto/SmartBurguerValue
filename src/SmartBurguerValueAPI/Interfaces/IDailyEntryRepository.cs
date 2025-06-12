@@ -1,4 +1,5 @@
-﻿using SmartBurguerValueAPI.IRepository.IRepositoryBase;
+﻿using SmartBurguerValueAPI.DTOs;
+using SmartBurguerValueAPI.IRepository.IRepositoryBase;
 using SmartBurguerValueAPI.Models;
 
 namespace SmartBurguerValueAPI.Interfaces

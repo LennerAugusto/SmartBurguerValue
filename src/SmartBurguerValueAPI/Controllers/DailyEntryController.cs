@@ -31,12 +31,19 @@ namespace SmartBurguerValueAPI.Controllers
             return Ok(DailyEntry);
         }
 
-        [HttpPost("create")]
-        public async Task<ActionResult<DailyEntryDTO>> CreateDailyEntry([FromBody] DailyEntryEntity dailyEntry)
+        public async Task<DailyEntryEntity> CreateWithItemsAsync(DailyEntryEntity entry, List<DailyEntryItemDTO> items)
         {
-            var DailyEntry = _unityOfWork.DailyEntryRepository.Create(dailyEntry);
-            await _unityOfWork.CommitAsync();
-            return Ok(DailyEntry);
+            entry.Id = Guid.NewGuid();
+            await _context.DailyEntry.AddAsync(entry);
+
+            foreach (var item in items)
+            {
+                var entryItem = await _unityOfWork.DailyEntryItemRepository.BuildDailyEntryItem(entry.Id, item);
+                if (entryItem != null)
+                    await _context.DailyEntryItem.AddAsync(entryItem);
+            }
+
+            return entry;
         }
 
 
