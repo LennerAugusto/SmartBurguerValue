@@ -89,7 +89,7 @@ namespace SmartBurguerValueAPI.Repository
                 .Where(cp => cp.ComboId == comboId)
                 .ToListAsync();
 
-            decimal totalCPV = 0;
+            decimal? totalCPV = 0;
             foreach (var cp in comboProducts)
             {
                 var analysis = await _context.ProductCostAnalysis
@@ -103,7 +103,7 @@ namespace SmartBurguerValueAPI.Repository
                 }
             }
 
-            return totalCPV;
+            return (decimal)totalCPV;
         }
     }
 }

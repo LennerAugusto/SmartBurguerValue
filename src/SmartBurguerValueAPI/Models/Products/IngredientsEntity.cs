@@ -11,6 +11,7 @@ namespace SmartBurguerValueAPI.Models.Products
         public decimal PurchaseQuantity { get; set; }
         public Guid UnitOfMeasureId { get; set; }
         public Guid InventoryItemId { get; set; }
+        public InventoryItemEntity InventoryItem { get; set; }
         [JsonIgnore]
         public UnityTypesProductsEntity UnitOfMeasure { get; set; }
         public decimal PurchasePrice { get; set; }
