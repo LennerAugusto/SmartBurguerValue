@@ -86,7 +86,7 @@ namespace SmartBurguerValueAPI.Repository.ProductsRepository
             product.ImageUrl = dto.ImageUrl;
             product.DateUpdated = DateTime.UtcNow;
 
-            await _productRepository.Update(product);
+             _productRepository.Update(product);
 
             await _productIngredientsRepository.RemoveAllByProductIdAsync(product.Id);
 

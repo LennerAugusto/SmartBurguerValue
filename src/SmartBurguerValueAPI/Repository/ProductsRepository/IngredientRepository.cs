@@ -14,25 +14,27 @@ namespace SmartBurguerValueAPI.Repository.ProductsRepository
         public IngredientRepository(AppDbContext context) : base(context)
         {
         }
-        public async Task<PagedList<IngredientDTO>> GetAllIngredientByEnterpriseId(PaginationParamiters paramiters, Guid enterpriseId)
+        public async Task<List<IngredientDTO>> GetAllIngredientByEnterpriseId( Guid enterpriseId)
         {
-            var query = _context.Ingredients // ou _context.Set<IngredientEntity>()
+            var query = _context.Ingredients 
                 .Where(x => x.EnterpriseId == enterpriseId)
                 .AsNoTracking()
                 .Select(x => new IngredientDTO
                 {
                     Id = x.Id,
                     Name = x.Name,
-                    PurchaseQuantity = x.PurchaseQuantity,
-                    PurchaseDate = x.PurchaseDate,
-                    PurchasePrice = x.PurchasePrice,
                     UnitOfMeasureId = x.UnitOfMeasureId,
-                    EnterpriseId = x.EnterpriseId
+                    UnitOfMeasureName = x.UnitOfMeasure != null ? x.UnitOfMeasure.Name : null, 
+                    ConversionFactor= x.UnitOfMeasure != null ? x.UnitOfMeasure.ConversionFactor : null, 
+                    EnterpriseId = x.EnterpriseId,
+                    IsActive = x.IsActive,
+                    DateCreated = x.DateCreated,
+                    DateUpdate = x.DateUpdated,
                 });
 
-            return PagedList<IngredientDTO>.ToPagedList(query, paramiters.PageNumber, paramiters.PageSize);
+            return await query.ToListAsync();
         }
-        public async Task CreateIngredient(IngredientsEntity entity)
+        public async Task<IngredientDTO> CreateIngredient(IngredientsEntity entity)
         {
             var now = DateTime.UtcNow;
 
@@ -45,6 +47,7 @@ namespace SmartBurguerValueAPI.Repository.ProductsRepository
                     i.EnterpriseId == entity.EnterpriseId &&
                     i.NameCategory == "Ingredient" &&
                     i.IsActive);
+
             if (existingItem != null)
             {
                 entity.InventoryItemId = existingItem.Id;
@@ -66,8 +69,23 @@ namespace SmartBurguerValueAPI.Repository.ProductsRepository
                 await _context.Set<InventoryItemEntity>().AddAsync(inventoryItem);
                 entity.InventoryItemId = inventoryItem.Id;
             }
+
+            entity.Id = Guid.NewGuid(); 
+
             await _context.Set<IngredientsEntity>().AddAsync(entity);
             await _context.SaveChangesAsync();
+
+            return new IngredientDTO
+            {
+                Id = entity.Id,
+                Name = entity.Name,
+                UnitOfMeasureId = entity.UnitOfMeasureId,
+                EnterpriseId = entity.EnterpriseId,
+                InventoryItemId = entity.InventoryItemId,
+                DateCreated = entity.DateCreated,
+                DateUpdate = entity.DateUpdated,
+                IsActive = entity.IsActive
+            };
         }
 
 

@@ -57,11 +57,11 @@ namespace SmartBurguerValueAPI.Controllers
 
 
         [HttpPut("update/")]
-        public ActionResult Put([FromBody] PurchaseEntity purchase)
+        public async Task<ActionResult> Put([FromBody] PurchaseEntity purchase)
         {
-            var Purchase = _unityOfWork.PurchaseRepository.Update(purchase);
-            _unityOfWork.CommitAsync();
-            return Ok(Purchase);
+            _unityOfWork.PurchaseRepository.Update(purchase);
+            await _unityOfWork.CommitAsync();
+            return Ok(purchase);
         }
 
         [HttpDelete("delete/{id:guid}")]

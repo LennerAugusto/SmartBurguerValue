@@ -49,9 +49,9 @@ namespace SmartBurguerValueAPI.Repository.Base
             return await _context.Set<T>().FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task Update(T entity)
+        public void Update(T entity)
         {
-            entity.DateUpdated = DateTime.Now;
+            entity.DateUpdated = DateTime.UtcNow;
             _context.Set<T>().Update(entity);
         }
 

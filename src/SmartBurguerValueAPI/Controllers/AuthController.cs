@@ -35,6 +35,7 @@ namespace SmartBurguerValueAPI.Controllers
 
         [HttpPost]
         [Route("login")]
+
         public async Task<IActionResult> Login([FromBody] LoginModelDTO model)
         {
             var user = await _userManager.FindByNameAsync(model.UserName);
@@ -46,6 +47,7 @@ namespace SmartBurguerValueAPI.Controllers
                 {
                     new Claim(ClaimTypes.Email, user.Email!),
                     new Claim(ClaimTypes.Name, user.UserName!),
+                    new Claim("EnterpriseId", user.EnterpriseId.ToString()),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 };
 
@@ -78,6 +80,7 @@ namespace SmartBurguerValueAPI.Controllers
 
         [HttpPost]
         [Route("register")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> Register([FromBody] RegisterModelDTO model)
         {
             var user = await _userManager.FindByNameAsync(model.UserName);
@@ -91,7 +94,8 @@ namespace SmartBurguerValueAPI.Controllers
             {
                 Email = model.Email,
                 SecurityStamp = Guid.NewGuid().ToString(),
-                UserName = model.UserName
+                UserName = model.UserName,
+                EnterpriseId = model.EnterpriseId,
             };
 
             var result = await _userManager.CreateAsync(Newuser, model.UserPassword);
@@ -105,6 +109,7 @@ namespace SmartBurguerValueAPI.Controllers
 
         [HttpPost]
         [Route("refresh-token")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> RefreshToken([FromBody] TokenModelDTO model)
         {
             if (model is null)
@@ -162,6 +167,7 @@ namespace SmartBurguerValueAPI.Controllers
 
         [HttpPost]
         [Route("CreateRole")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> CreateRole(string roleName)
         {
             var roleExist = await _roleManager.RoleExistsAsync(roleName);
@@ -199,6 +205,7 @@ namespace SmartBurguerValueAPI.Controllers
 
         [HttpPost]
         [Route("AddUserToRole")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<IActionResult> AddUserToRole(string email, string roleName)
         {
             var user = await _userManager.FindByEmailAsync(email);

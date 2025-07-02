@@ -6,5 +6,6 @@ namespace SmartBurguerValueAPI.Models
     {
         public string? RefreshToken { get; set; }
         public DateTime RefreshTokenExiryTime { get; set; }
+        public Guid? EnterpriseId { get; set; }
     }
 }

@@ -173,6 +173,9 @@ namespace SmartBurguerValueAPI.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<Guid?>("EnterpriseId")
+                        .HasColumnType("char(36)");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("tinyint(1)");
 
@@ -522,9 +525,6 @@ namespace SmartBurguerValueAPI.Migrations
                     b.Property<Guid>("EnterpriseId")
                         .HasColumnType("char(36)");
 
-                    b.Property<Guid>("IngredientId")
-                        .HasColumnType("char(36)");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)");
 
@@ -541,8 +541,6 @@ namespace SmartBurguerValueAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IngredientId");
-
                     b.ToTable("InventoryItem");
                 });
 
@@ -555,7 +553,7 @@ namespace SmartBurguerValueAPI.Migrations
                     b.Property<DateTime>("AnalisysDate")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<decimal>("CPV")
+                    b.Property<decimal?>("CPV")
                         .HasColumnType("decimal(65,30)");
 
                     b.Property<DateTime>("DateCreated")
@@ -570,22 +568,22 @@ namespace SmartBurguerValueAPI.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<decimal>("Margin")
+                    b.Property<decimal?>("Margin")
                         .HasColumnType("decimal(65,30)");
 
-                    b.Property<decimal>("Markup")
+                    b.Property<decimal?>("Markup")
                         .HasColumnType("decimal(65,30)");
 
                     b.Property<Guid>("ProductId")
                         .HasColumnType("char(36)");
 
-                    b.Property<decimal>("SellingPrice")
+                    b.Property<decimal?>("SellingPrice")
                         .HasColumnType("decimal(65,30)");
 
-                    b.Property<decimal>("SellingPriceSuggested")
+                    b.Property<decimal?>("SellingPriceSuggested")
                         .HasColumnType("decimal(65,30)");
 
-                    b.Property<decimal>("UnitCost")
+                    b.Property<decimal?>("UnitCost")
                         .HasColumnType("decimal(65,30)");
 
                     b.HasKey("Id");
@@ -687,21 +685,15 @@ namespace SmartBurguerValueAPI.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<DateTime>("PurchaseDate")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<decimal>("PurchasePrice")
-                        .HasColumnType("decimal(65,30)");
-
-                    b.Property<decimal>("PurchaseQuantity")
-                        .HasColumnType("decimal(65,30)");
-
                     b.Property<Guid>("UnitOfMeasureId")
                         .HasColumnType("char(36)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("EnterpriseId");
+
+                    b.HasIndex("InventoryItemId")
+                        .IsUnique();
 
                     b.HasIndex("UnitOfMeasureId");
 
@@ -1000,7 +992,7 @@ namespace SmartBurguerValueAPI.Migrations
                         .HasForeignKey("ComboId");
 
                     b.HasOne("SmartBurguerValueAPI.Models.DailyEntryEntity", "DailyEntry")
-                        .WithMany()
+                        .WithMany("Items")
                         .HasForeignKey("DailyEntryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1047,17 +1039,6 @@ namespace SmartBurguerValueAPI.Migrations
                         .IsRequired();
 
                     b.Navigation("Enterprise");
-                });
-
-            modelBuilder.Entity("SmartBurguerValueAPI.Models.InventoryItemEntity", b =>
-                {
-                    b.HasOne("SmartBurguerValueAPI.Models.Products.IngredientsEntity", "Ingredient")
-                        .WithMany()
-                        .HasForeignKey("IngredientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Ingredient");
                 });
 
             modelBuilder.Entity("SmartBurguerValueAPI.Models.ProductCostAnalysisEntity", b =>
@@ -1117,6 +1098,12 @@ namespace SmartBurguerValueAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("SmartBurguerValueAPI.Models.InventoryItemEntity", "InventoryItem")
+                        .WithOne("Ingredient")
+                        .HasForeignKey("SmartBurguerValueAPI.Models.Products.IngredientsEntity", "InventoryItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("SmartBurguerValueAPI.Models.Products.UnityTypesProductsEntity", "UnitOfMeasure")
                         .WithMany("Ingredients")
                         .HasForeignKey("UnitOfMeasureId")
@@ -1124,6 +1111,8 @@ namespace SmartBurguerValueAPI.Migrations
                         .IsRequired();
 
                     b.Navigation("Enterprise");
+
+                    b.Navigation("InventoryItem");
 
                     b.Navigation("UnitOfMeasure");
                 });
@@ -1196,6 +1185,11 @@ namespace SmartBurguerValueAPI.Migrations
                     b.Navigation("UnityOfMensure");
                 });
 
+            modelBuilder.Entity("SmartBurguerValueAPI.Models.DailyEntryEntity", b =>
+                {
+                    b.Navigation("Items");
+                });
+
             modelBuilder.Entity("SmartBurguerValueAPI.Models.EmployeeEntity", b =>
                 {
                     b.Navigation("EmployeeSchedules");
@@ -1216,6 +1210,9 @@ namespace SmartBurguerValueAPI.Migrations
 
             modelBuilder.Entity("SmartBurguerValueAPI.Models.InventoryItemEntity", b =>
                 {
+                    b.Navigation("Ingredient")
+                        .IsRequired();
+
                     b.Navigation("PurchaseItems");
                 });
 

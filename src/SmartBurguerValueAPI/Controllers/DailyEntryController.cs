@@ -30,7 +30,7 @@ namespace SmartBurguerValueAPI.Controllers
             var DailyEntry = _unityOfWork.DailyEntryRepository.GetByIdAsync(DailyEntryId);
             return Ok(DailyEntry);
         }
-
+        [HttpPost("create/")]
         public async Task<DailyEntryEntity> CreateWithItemsAsync(DailyEntryEntity entry, List<DailyEntryItemDTO> items)
         {
             entry.Id = Guid.NewGuid();
@@ -48,12 +48,14 @@ namespace SmartBurguerValueAPI.Controllers
 
 
         [HttpPut("update/")]
-        public ActionResult Put([FromBody] DailyEntryEntity dailyEntry)
+        public async Task<ActionResult> Put([FromBody] DailyEntryEntity dailyEntry)
         {
-            var DailyEntry = _unityOfWork.DailyEntryRepository.Update(dailyEntry);
-            _unityOfWork.CommitAsync();
-            return Ok(DailyEntry);
+            _unityOfWork.DailyEntryRepository.Update(dailyEntry);
+            await _unityOfWork.CommitAsync();
+
+            return Ok(dailyEntry);
         }
+
 
         [HttpDelete("delete/{id:guid}")]
         public async Task<ActionResult> Delete(Guid id)

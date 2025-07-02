@@ -59,6 +59,7 @@ namespace SmartBurguerValueAPI.Context
                 .HasOne(cp => cp.Product)
                 .WithMany(p => p.ComboProducts)
                 .HasForeignKey(cp => cp.ProductId);
+          
         }
 
     }

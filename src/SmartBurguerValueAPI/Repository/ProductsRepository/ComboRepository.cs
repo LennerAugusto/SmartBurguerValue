@@ -83,7 +83,7 @@ namespace SmartBurguerValueAPI.Repository.ProductsRepository
             combo.Description = dto.Description;
             combo.DateUpdated = DateTime.UtcNow;
 
-            await _comboRepository.Update(combo);
+             _comboRepository.Update(combo);
 
             await _comboProductRepository.RemoveAllByComboIdAsync(combo.Id);
 

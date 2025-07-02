@@ -28,47 +28,38 @@ namespace SmartBurguerValueAPI.Controllers
             return Ok(Ingredients);
         }
         [HttpGet("get-all/by-enterprise-id")]
-        public async Task<ActionResult<IEnumerable<IngredientDTO>>> GetAllIngredientByEnterpriseId(PaginationParamiters paramiters, Guid EnterpriseId)
+        public async Task<ActionResult<IEnumerable<IngredientDTO>>> GetAllIngredientByEnterpriseId(Guid enterpriseId)
         {
-            var Ingredients = await _unityOfWork.IngredientRepository.GetAllIngredientByEnterpriseId(paramiters, EnterpriseId);
+            var ingredients = await _unityOfWork.IngredientRepository.GetAllIngredientByEnterpriseId(enterpriseId);
 
-            var metadata = new
-            {
-                Ingredients.TotalCount,
-                Ingredients.PageSize,
-                Ingredients.CurrentPage,
-                Ingredients.TotalPages,
-                Ingredients.HasNext,
-                Ingredients.HasPrevius
-            };
-
-            Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
-
-            return Ok(Ingredients);
+            return Ok(ingredients);
         }
         [HttpGet("get-by-id/")]
         public async Task<IActionResult> GetIngredientById(Guid IngredientId)
         {
-            var Ingredient = _unityOfWork.IngredientRepository.GetByIdAsync(IngredientId);
+            var Ingredient = await _unityOfWork.IngredientRepository.GetByIdAsync(IngredientId);
             return Ok(Ingredient);
         }
 
         [HttpPost("create")]
         public async Task<ActionResult<IngredientDTO>> CreateIngredient([FromBody] IngredientsEntity ingredient)
         {
-            var Ingredient = _unityOfWork.IngredientRepository.CreateIngredient(ingredient);
+            var Ingredient = await _unityOfWork.IngredientRepository.CreateIngredient(ingredient);
             await _unityOfWork.CommitAsync();
             return Ok(Ingredient);
         }
 
 
         [HttpPut("update/")]
-        public ActionResult Put([FromBody] IngredientsEntity ingredient)
+        public async Task<IActionResult> Put([FromBody] IngredientsEntity ingredient)
         {
-            var Ingredient = _unityOfWork.IngredientRepository.Update(ingredient);
-            _unityOfWork.CommitAsync();
-            return Ok(Ingredient);
+            _unityOfWork.IngredientRepository.Update(ingredient);
+            await _unityOfWork.CommitAsync();
+
+            var updatedIngredient = await _unityOfWork.IngredientRepository.GetByIdAsync(ingredient.Id);
+            return Ok(updatedIngredient);
         }
+
 
         [HttpDelete("delete/{id:guid}")]
         public async Task<ActionResult> Delete(Guid id)

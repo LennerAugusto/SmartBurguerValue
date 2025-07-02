@@ -2,6 +2,7 @@
 {
     public class UnityTypesDTO
     {
+        public Guid Id { get; set; }
         public string Name { get; set; }
         public string Symbol { get; set; }
         public string BaseUnit { get; set; }

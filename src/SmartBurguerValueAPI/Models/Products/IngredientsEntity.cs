@@ -8,14 +8,13 @@ namespace SmartBurguerValueAPI.Models.Products
     public class IngredientsEntity : BaseEntity
     {
         public string Name { get; set; }
-        public decimal PurchaseQuantity { get; set; }
+ 
         public Guid UnitOfMeasureId { get; set; }
         public Guid InventoryItemId { get; set; }
+        [JsonIgnore]
         public InventoryItemEntity InventoryItem { get; set; }
         [JsonIgnore]
         public UnityTypesProductsEntity UnitOfMeasure { get; set; }
-        public decimal PurchasePrice { get; set; }
-        public DateTime PurchaseDate { get; set; }
         public Guid EnterpriseId { get; set; }
         [JsonIgnore]
         public EnterpriseEntity Enterprise { get; set; }

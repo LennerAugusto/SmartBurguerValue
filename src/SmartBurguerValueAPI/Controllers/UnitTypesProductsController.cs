@@ -6,9 +6,11 @@ using SmartBurguerValueAPI.Models.Products;
 using SmartBurguerValueAPI.IRepository.IProducts;
 using SmartBurguerValueAPI.Interfaces;
 using SmartBurguerValueAPI.Repository;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SmartBurguerValueAPI.Controllers
 {
+    //[Authorize(Policy = "Enterprise")]
     [Route("api/unit-types")]
     public class UnitTypesProductsController : ControllerBase
     {
@@ -45,12 +47,13 @@ namespace SmartBurguerValueAPI.Controllers
 
 
         [HttpPut("update/")]
-        public ActionResult Put([FromBody]UnityTypesProductsEntity unityType)
+        public async Task<ActionResult> Put([FromBody] UnityTypesProductsEntity unityType)
         {
-            var UnityType = _unityOfWork.UnityTypesRepository.Update(unityType);
-            _unityOfWork.CommitAsync();
-            return Ok(UnityType);
+            _unityOfWork.UnityTypesRepository.Update(unityType);
+            await _unityOfWork.CommitAsync();
+            return Ok(unityType);
         }
+
 
         [HttpDelete("delete/{id:guid}")]
         public async Task<ActionResult> Delete(Guid id)

@@ -44,11 +44,11 @@ namespace SmartBurguerValueAPI.Controllers
 
 
         [HttpPut("update/")]
-        public ActionResult Put([FromBody] EnterpriseEntity enterprise)
+        public async Task<ActionResult> Put([FromBody] EnterpriseEntity enterprise)
         {
-            var Enterprise = _unityOfWork.EnterpriseRepository.Update(enterprise);
-            _unityOfWork.CommitAsync();
-            return Ok(Enterprise);
+            _unityOfWork.EnterpriseRepository.Update(enterprise);
+            await _unityOfWork.CommitAsync();
+            return Ok(enterprise);
         }
 
         [HttpDelete("delete/{id:guid}")]

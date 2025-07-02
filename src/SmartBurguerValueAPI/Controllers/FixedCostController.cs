@@ -63,12 +63,13 @@ namespace SmartBurguerValueAPI.Controllers
 
 
         [HttpPut("update/")]
-        public ActionResult Put([FromBody] FixedCostEntity fixedCoast)
+        public async Task<ActionResult> Put([FromBody] FixedCostEntity fixedCoast)
         {
-            var FixedCoast = _unityOfWork.FixedCoastRepository.Update(fixedCoast);
-            _unityOfWork.CommitAsync();
-            return Ok(FixedCoast);
+            _unityOfWork.FixedCoastRepository.Update(fixedCoast);
+            await _unityOfWork.CommitAsync();
+            return Ok(fixedCoast);
         }
+
 
         [HttpDelete("delete/{id:guid}")]
         public async Task<ActionResult> Delete(Guid id)

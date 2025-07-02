@@ -7,7 +7,7 @@ namespace SmartBurguerValueAPI.Interfaces.IProducts
 {
     public interface IIngredientRepository : IRepositoryBase<IngredientsEntity>
     {
-        Task<PagedList<IngredientDTO>> GetAllIngredientByEnterpriseId(PaginationParamiters paramiters, Guid EnterpriseId);
-        Task CreateIngredient(IngredientsEntity ingredient);
+        Task<List<IngredientDTO>> GetAllIngredientByEnterpriseId( Guid EnterpriseId);
+        Task<IngredientDTO> CreateIngredient(IngredientsEntity ingredient);
     }
 }

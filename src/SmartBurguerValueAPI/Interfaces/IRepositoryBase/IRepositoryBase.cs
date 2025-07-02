@@ -6,7 +6,7 @@ namespace SmartBurguerValueAPI.IRepository.IRepositoryBase
     {
         Task<T> GetByIdAsync(Guid id);
         Task Create(T entity);
-        Task Update(T entity);
+        void Update(T entity);
         Task<IEnumerable<T>> GetAllAsync();
         Task<IEnumerable<T>> GetAllAsync(bool? isActive = null);
         Task Delete(T entity);

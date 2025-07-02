@@ -12,6 +12,7 @@ namespace SmartBurguerValueAPI.Mappings
         {
             /*UnityTypesProducts*/
             CreateMap<BaseDTO, UnityTypesProductsEntity>().ReverseMap();
+            CreateMap<IngredientDTO, IngredientsEntity>().ReverseMap();
         }
     }
 }
