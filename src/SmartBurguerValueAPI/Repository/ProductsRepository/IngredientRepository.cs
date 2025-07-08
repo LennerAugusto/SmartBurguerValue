@@ -30,6 +30,7 @@ namespace SmartBurguerValueAPI.Repository.ProductsRepository
                     IsActive = x.IsActive,
                     DateCreated = x.DateCreated,
                     DateUpdate = x.DateUpdated,
+                    InventoryItemId = x.InventoryItemId,
                 });
 
             return await query.ToListAsync();
@@ -37,7 +38,8 @@ namespace SmartBurguerValueAPI.Repository.ProductsRepository
         public async Task<IngredientDTO> CreateIngredient(IngredientsEntity entity)
         {
             var now = DateTime.UtcNow;
-
+            if (entity == null)
+                throw new ArgumentNullException(nameof(entity), "O objeto 'entity' não pode ser nulo.");
             entity.DateCreated = entity.DateCreated == default ? now : entity.DateCreated;
             entity.DateUpdated = now;
 

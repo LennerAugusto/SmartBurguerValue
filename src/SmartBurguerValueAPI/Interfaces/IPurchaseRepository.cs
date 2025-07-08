@@ -8,6 +8,7 @@ namespace SmartBurguerValueAPI.Interfaces
 {
     public interface IPurchaseRepository : IRepositoryBase<PurchaseEntity>
     {
-        Task<PagedList<PurchaseDTO>> GetAllPurchasesByEnterpriseId(PaginationParamiters pagination, Guid EnterpriseId);
+        Task <List<PurchaseDTO>> GetAllPurchasesByEnterpriseId(Guid EnterpriseId);
+        Task<PurchaseEntity> CreatePurchase(PurchaseDTO dto);
     }
 }

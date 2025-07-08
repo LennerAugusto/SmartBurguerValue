@@ -4,6 +4,7 @@ using SmartBurguerValueAPI.Context;
 using SmartBurguerValueAPI.DTOs;
 using SmartBurguerValueAPI.Interfaces;
 using SmartBurguerValueAPI.Models;
+using SmartBurguerValueAPI.Models.Products;
 using SmartBurguerValueAPI.Pagination;
 
 namespace SmartBurguerValueAPI.Controllers
@@ -22,14 +23,15 @@ namespace SmartBurguerValueAPI.Controllers
         [HttpPost("create")]
         public async Task<ActionResult<EmployeeDTO>> CreateEmployee([FromBody] EmployeeDTO employee)
         {
-            var Employee = _unityOfWork.EmployeeRepository.CreateEmployee(employee);
+            var createdEmployee = _unityOfWork.EmployeeRepository.CreateEmployee(employee);
             await _unityOfWork.CommitAsync();
-            return Ok(Employee);
+            return Ok(createdEmployee);
         }
+
         [HttpGet("get-by-id/")]
         public async Task<IActionResult> GetEmployeeById(Guid EmployeeId)
         {
-            var Employee = _unityOfWork.EmployeeRepository.GetByIdAsync(EmployeeId);
+            var Employee = await _unityOfWork.EmployeeRepository.GetByIdAsync(EmployeeId);
             return Ok(Employee);
         }
         [HttpGet("get-all")]
@@ -39,23 +41,19 @@ namespace SmartBurguerValueAPI.Controllers
             return Ok(Employees);
         }
         [HttpGet("get-all/by-enterprise-id")]
-        public async Task<ActionResult<IEnumerable<EmployeeDTO>>> GetAllEmployeeByEnterpriseId(PaginationParamiters paramiters, Guid EnterpriseId)
+        public async Task<ActionResult<IEnumerable<EmployeeDTO>>> GetAllEmployeeByEnterpriseId(Guid EnterpriseId)
         {
-            var Employees = await _unityOfWork.EmployeeRepository.GetAllEmployeeByEnterpriseId(paramiters, EnterpriseId);
-
-            var metadata = new
-            {
-                Employees.TotalCount,
-                Employees.PageSize,
-                Employees.CurrentPage,
-                Employees.TotalPages,
-                Employees.HasNext,
-                Employees.HasPrevius
-            };
-
-            Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
-
+            var Employees = await _unityOfWork.EmployeeRepository.GetAllEmployeeByEnterpriseId(EnterpriseId);
             return Ok(Employees);
+        }
+        [HttpPut("update/")]
+        public async Task<IActionResult> Put([FromBody] EmployeeDTO employee)
+        {
+            await _unityOfWork.EmployeeRepository.UpdateEmployee(employee);
+            await _unityOfWork.CommitAsync();
+
+            var updateemployee = await _unityOfWork.EmployeeRepository.GetByIdAsync(employee.Id);
+            return Ok(updateemployee);
         }
         [HttpDelete("delete/{id:guid}")]
         public async Task<ActionResult> Delete(Guid id)

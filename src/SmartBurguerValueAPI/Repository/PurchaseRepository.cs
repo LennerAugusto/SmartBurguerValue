@@ -1,4 +1,5 @@
-﻿using SmartBurguerValueAPI.Context;
+﻿using Microsoft.EntityFrameworkCore;
+using SmartBurguerValueAPI.Context;
 using SmartBurguerValueAPI.DTOs;
 using SmartBurguerValueAPI.DTOs.Products;
 using SmartBurguerValueAPI.Interfaces;
@@ -13,9 +14,9 @@ namespace SmartBurguerValueAPI.Repository
         public PurchaseRepository(AppDbContext context) : base(context)
         {
         }
-        public async Task<PagedList<PurchaseDTO>> GetAllPurchasesByEnterpriseId(PaginationParamiters paramiters, Guid enterpriseId)
+        public async Task<List<PurchaseDTO>> GetAllPurchasesByEnterpriseId(Guid enterpriseId)
         {
-            var query = _context.Purchase
+            var query = await _context.Purchase
                 .Where(x => x.EnterpriseId == enterpriseId)
                 .OrderBy(x => x.Id)
                 .Select(x => new PurchaseDTO
@@ -30,10 +31,74 @@ namespace SmartBurguerValueAPI.Repository
                         Quantity = i.Quantity,
                         UnitPrice = i.UnitPrice,
                     }).ToList()
-                });
+                }).ToListAsync();
+            return query;
+        }
 
-            var productsOrder = PagedList<PurchaseDTO>.ToPagedList(query, paramiters.PageNumber, paramiters.PageSize);
-            return productsOrder;
+        //public async Task<PurchaseEntity> CreatePurchase(PurchaseDTO dto)
+        //{
+        //    if (dto == null)
+        //        throw new ArgumentNullException(nameof(dto));
+
+        //    var entity = new PurchaseEntity
+        //    {
+        //        Id = dto.Id != Guid.Empty ? dto.Id : Guid.NewGuid(),
+        //        SupplierName = dto.SupplierName,
+        //        PurchaseDate = dto.PurchaseDate,
+        //        TotalAmount = dto.TotalAmount,
+        //        IsActive = dto.IsActive,
+        //        DateCreated = dto.DateCreated != default ? dto.DateCreated : DateTime.UtcNow,
+        //        DateUpdated = DateTime.UtcNow,
+        //        EnterpriseId = dto.EnterpriseId,
+        //        Items = dto.PurchaseItems.Select(i => new PurchaseItemEntity
+        //        {
+        //            Id = Guid.NewGuid(),
+        //            PurchaseId = dto.Id, // será atribuído após salvar a compra, se necessário
+        //            NameItem = i.NameItem,
+        //            Quantity = i.Quantity,
+        //            UnitPrice = i.UnitPrice,
+        //            UnityOfMensureId = i.UnityOfMeasureId
+        //        }).ToList()
+        //    };
+
+        //    _context.Purchase.Add(entity);
+        //    await _context.SaveChangesAsync();
+
+        //    return entity;
+        //}
+        public async Task<PurchaseEntity> CreatePurchase(PurchaseDTO dto)
+        {
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto));
+
+            var purchaseId = dto.Id != Guid.Empty ? dto.Id : Guid.NewGuid();
+
+            var entity = new PurchaseEntity
+            {
+                Id = purchaseId,
+                SupplierName = dto.SupplierName,
+                PurchaseDate = dto.PurchaseDate,
+                TotalAmount = dto.TotalAmount,
+                IsActive = dto.IsActive,
+                DateCreated = dto.DateCreated != default ? dto.DateCreated : DateTime.UtcNow,
+                DateUpdated = DateTime.UtcNow,
+                EnterpriseId = dto.EnterpriseId,
+                Items = dto.PurchaseItems.Select(i => new PurchaseItemEntity
+                {
+                    Id = Guid.NewGuid(),
+                    PurchaseId = purchaseId, 
+                    NameItem = i.NameItem,
+                    Quantity = i.Quantity,
+                    UnitPrice = i.UnitPrice,
+                    UnityOfMensureId = i.UnityOfMeasureId,
+                    InventoryItemId = i.InventoryItemId
+                }).ToList()
+            };
+
+            _context.Purchase.Add(entity);
+            await _context.SaveChangesAsync();
+
+            return entity;
         }
 
     }

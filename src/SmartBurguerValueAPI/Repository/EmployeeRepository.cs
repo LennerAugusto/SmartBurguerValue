@@ -22,7 +22,7 @@ namespace SmartBurguerValueAPI.Repository
                 Name = dto.Name,
                 Position = dto.Position,
                 EmployeeType = dto.EmploymentType,
-                MonthlySalary = dto.EmploymentType == "monthly" ? dto.MonthlySalary : null,
+                MonthlySalary = dto.MonthlySalary,
                 EnterpriseId = dto.EnterpriseId,
                 DateCreated = DateTime.UtcNow,
                 DateUpdated = DateTime.UtcNow,
@@ -31,7 +31,7 @@ namespace SmartBurguerValueAPI.Repository
 
             await _context.Employees.AddAsync(employee);
 
-            if (dto.EmploymentType == "daily")
+            if (dto.EmploymentType == "Daily")
             {
                 foreach (var ws in dto.WorkSchedules)
                 {
@@ -48,12 +48,10 @@ namespace SmartBurguerValueAPI.Repository
                     await _context.EmployeesWorkSchedule.AddAsync(schedule);
                 }
             }
-
-             _context.SaveChangesAsync();
         }
-        public async Task<PagedList<EmployeeDTO>> GetAllEmployeeByEnterpriseId(PaginationParamiters paramiters, Guid enterpriseId)
+        public async Task <List<EmployeeDTO>> GetAllEmployeeByEnterpriseId(Guid enterpriseId)
         {
-            var query = _context.Set<EmployeeDTO>()
+            var query = _context.Set<EmployeeEntity>()
                 .Where(x => x.EnterpriseId == enterpriseId)
                 .AsNoTracking()
                 .Select(x => new EmployeeDTO
@@ -61,35 +59,40 @@ namespace SmartBurguerValueAPI.Repository
                     Id = x.Id,
                     Name = x.Name,
                     Position = x.Position,
-                    EmploymentType = x.EmploymentType,
+                    EmploymentType = x.EmployeeType,
                     MonthlySalary = x.MonthlySalary,
-                    EnterpriseId = x.EnterpriseId
+                    EnterpriseId = x.EnterpriseId,
+                    IsActive = x.IsActive,
+                    WorkSchedules = x.EmployeeSchedules.Select(ws => new WorkScheduleDTO
+                      {
+                          Weekday = ws.WeekDay,
+                          DailyRate = ws.DailyRate
+                      }).ToList()
                 });
 
-            return PagedList<EmployeeDTO>.ToPagedList(query, paramiters.PageNumber, paramiters.PageSize);
+            return await query.ToListAsync();
         }
-        public async Task EmployeeUpdate(EmployeeDTO dto)
+        public async Task UpdateEmployee(EmployeeDTO dto)
         {
             var employee = await _context.Employees
-           .Include(e => e.EmployeeSchedules)
-           .FirstOrDefaultAsync(e => e.Id == dto.Id);
+                .FirstOrDefaultAsync(e => e.Id == dto.Id);
 
             if (employee == null)
-                 throw new Exception($"Employee not found: {dto.Id}"); ;
+                throw new Exception("Funcionário não encontrado.");
 
             employee.Name = dto.Name;
             employee.Position = dto.Position;
             employee.EmployeeType = dto.EmploymentType;
-            employee.MonthlySalary = dto.EmploymentType == "monthly" ? dto.MonthlySalary : null;
+            employee.MonthlySalary = dto.MonthlySalary;
             employee.DateUpdated = DateTime.UtcNow;
 
-            if (employee.EmployeeType == "daily")
+            if (dto.EmploymentType == "Daily")
             {
-                var existing = await _context.EmployeesWorkSchedule
-                    .Where(e => e.EmployeeId == employee.Id)
+                    var oldSchedules = await _context.EmployeesWorkSchedule
+                    .Where(ws => ws.EmployeeId == employee.Id)
                     .ToListAsync();
 
-                _context.EmployeesWorkSchedule.RemoveRange(existing);
+                _context.EmployeesWorkSchedule.RemoveRange(oldSchedules);
 
                 foreach (var ws in dto.WorkSchedules)
                 {
@@ -103,8 +106,16 @@ namespace SmartBurguerValueAPI.Repository
                         DateUpdated = DateTime.UtcNow,
                         IsActive = true
                     };
-                    await _context.AddAsync(schedule);
+                    await _context.EmployeesWorkSchedule.AddAsync(schedule);
                 }
+            }
+            else
+            {
+                var oldSchedules = await _context.EmployeesWorkSchedule
+                    .Where(ws => ws.EmployeeId == employee.Id)
+                    .ToListAsync();
+
+                _context.EmployeesWorkSchedule.RemoveRange(oldSchedules);
             }
 
             await _context.SaveChangesAsync();

@@ -21,36 +21,23 @@ namespace SmartBurguerValueAPI.Controllers
             _unityOfWork = unityOfWork;
         }
         [HttpGet("get-all/by-enterprise-id")]
-        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetAllPurchaseByEnterprise(PaginationParamiters paramiters, Guid EnterpriseId)
+        public async Task<ActionResult<IEnumerable<PurchaseDTO>>> GetAllPurchaseByEnterprise(Guid EnterpriseId)
         {
-            var Purchases = await _unityOfWork.PurchaseRepository.GetAllPurchasesByEnterpriseId(paramiters, EnterpriseId);
-
-            var metadata = new
-            {
-                Purchases.TotalCount,
-                Purchases.PageSize,
-                Purchases.CurrentPage,
-                Purchases.TotalPages,
-                Purchases.HasNext,
-                Purchases.HasPrevius
-            };
-
-            Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
-
+            var Purchases = await _unityOfWork.PurchaseRepository.GetAllPurchasesByEnterpriseId(EnterpriseId);
             return Ok(Purchases);
         }
 
         [HttpGet("get-by-id/")]
         public async Task<IActionResult> GetPurchaseById(Guid PurchaseId)
         {
-            var Purchase = _unityOfWork.PurchaseRepository.GetByIdAsync(PurchaseId);
+            var Purchase = await _unityOfWork.PurchaseRepository.GetByIdAsync(PurchaseId);
             return Ok(Purchase);
         }
 
         [HttpPost("create")]
-        public async Task<ActionResult<PurchaseDTO>> CreatePurchase([FromBody] PurchaseEntity purchase)
+        public async Task<ActionResult<PurchaseDTO>> CreatePurchase([FromBody] PurchaseDTO purchase)
         {
-            var Purchase = _unityOfWork.PurchaseRepository.Create(purchase);
+            var Purchase = await _unityOfWork.PurchaseRepository.CreatePurchase(purchase);
             await _unityOfWork.CommitAsync();
             return Ok(Purchase);
         }

@@ -1,11 +1,10 @@
 ﻿namespace SmartBurguerValueAPI.DTOs
 {
-    public class EmployeeDTO
+    public class EmployeeDTO : BaseDTO
     {
-        public Guid Id { get; set; }
         public string Name { get; set; }
         public string Position { get; set; }
-        public string? EmploymentType { get; set; } // "monthly" ou "daily"
+        public string? EmploymentType { get; set; } 
         public decimal? MonthlySalary { get; set; }
         public Guid EnterpriseId { get; set; }
 

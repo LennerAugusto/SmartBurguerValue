@@ -1,4 +1,5 @@
 ﻿using SmartBurguerValueAPI.Models.Products;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SmartBurguerValueAPI.Models
 {
@@ -12,7 +13,9 @@ namespace SmartBurguerValueAPI.Models
         public InventoryItemEntity InventoryItem { get; set; }
         public Guid UnityOfMensureId { get; set;}
         public UnityTypesProductsEntity UnityOfMensure { get; set; }
+        [Column(TypeName = "decimal(18,0)")]
         public decimal Quantity { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
         public decimal UnitPrice { get; set; }
     }
 }

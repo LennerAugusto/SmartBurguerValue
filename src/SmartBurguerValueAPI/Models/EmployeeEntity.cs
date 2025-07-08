@@ -1,10 +1,13 @@
-﻿namespace SmartBurguerValueAPI.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace SmartBurguerValueAPI.Models
 {
     public class EmployeeEntity : BaseEntity
     {
         public string Name { get; set; }
         public string? Position { get; set; }
         public string EmployeeType { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
         public decimal? MonthlySalary { get; set; }
         public Guid EnterpriseId { get; set; }
         public string? UserId { get; set; }
