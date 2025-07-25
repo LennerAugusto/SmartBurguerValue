@@ -15,5 +15,6 @@ namespace SmartBurguerValueAPI.Models
         public decimal? Markup{get;set;}
         public decimal? Margin{get;set;}
         public decimal? CPV{get;set;}
+        public decimal? CMV{get;set;}
     }
 }

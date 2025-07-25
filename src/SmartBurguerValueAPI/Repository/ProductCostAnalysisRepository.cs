@@ -43,7 +43,7 @@ namespace SmartBurguerValueAPI.Repository
             decimal? sellingPrice = product.SellingPrice;
             decimal? markup = unitCost > 0 ? (sellingPrice - unitCost) / unitCost : 0;
             decimal? margin = sellingPrice > 0 ? (sellingPrice - unitCost) / sellingPrice : 0;
-
+            decimal? cmv = unitCost / sellingPrice;
             var analysis = new ProductCostAnalysisEntity
             {
                 Id = Guid.NewGuid(),
@@ -55,6 +55,7 @@ namespace SmartBurguerValueAPI.Repository
                 Markup = markup,
                 Margin = margin,
                 CPV = unitCost,
+                CMV = cmv,
                 DateCreated = DateTime.UtcNow,
                 DateUpdated = DateTime.UtcNow,
                 IsActive = true

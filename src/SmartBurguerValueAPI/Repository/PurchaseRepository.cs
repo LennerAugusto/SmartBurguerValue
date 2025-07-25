@@ -35,37 +35,6 @@ namespace SmartBurguerValueAPI.Repository
             return query;
         }
 
-        //public async Task<PurchaseEntity> CreatePurchase(PurchaseDTO dto)
-        //{
-        //    if (dto == null)
-        //        throw new ArgumentNullException(nameof(dto));
-
-        //    var entity = new PurchaseEntity
-        //    {
-        //        Id = dto.Id != Guid.Empty ? dto.Id : Guid.NewGuid(),
-        //        SupplierName = dto.SupplierName,
-        //        PurchaseDate = dto.PurchaseDate,
-        //        TotalAmount = dto.TotalAmount,
-        //        IsActive = dto.IsActive,
-        //        DateCreated = dto.DateCreated != default ? dto.DateCreated : DateTime.UtcNow,
-        //        DateUpdated = DateTime.UtcNow,
-        //        EnterpriseId = dto.EnterpriseId,
-        //        Items = dto.PurchaseItems.Select(i => new PurchaseItemEntity
-        //        {
-        //            Id = Guid.NewGuid(),
-        //            PurchaseId = dto.Id, // será atribuído após salvar a compra, se necessário
-        //            NameItem = i.NameItem,
-        //            Quantity = i.Quantity,
-        //            UnitPrice = i.UnitPrice,
-        //            UnityOfMensureId = i.UnityOfMeasureId
-        //        }).ToList()
-        //    };
-
-        //    _context.Purchase.Add(entity);
-        //    await _context.SaveChangesAsync();
-
-        //    return entity;
-        //}
         public async Task<PurchaseEntity> CreatePurchase(PurchaseDTO dto)
         {
             if (dto == null)
@@ -90,6 +59,7 @@ namespace SmartBurguerValueAPI.Repository
                     NameItem = i.NameItem,
                     Quantity = i.Quantity,
                     UnitPrice = i.UnitPrice,
+                    IngredientId = i.IngredientId,
                     UnityOfMensureId = i.UnityOfMeasureId,
                     InventoryItemId = i.InventoryItemId
                 }).ToList()
@@ -100,6 +70,12 @@ namespace SmartBurguerValueAPI.Repository
 
             return entity;
         }
-
+        public async Task<PurchaseItemEntity> GetPurchaseItemRencentlyByIngredientId(Guid IngredientId)
+        {
+            return await _context.PurchaseItem
+                .Where(x => x.IngredientId == IngredientId)
+                .OrderByDescending(x => x.DateCreated)
+                .FirstOrDefaultAsync();
+        }
     }
 }

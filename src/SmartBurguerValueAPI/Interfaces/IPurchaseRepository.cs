@@ -10,5 +10,6 @@ namespace SmartBurguerValueAPI.Interfaces
     {
         Task <List<PurchaseDTO>> GetAllPurchasesByEnterpriseId(Guid EnterpriseId);
         Task<PurchaseEntity> CreatePurchase(PurchaseDTO dto);
+        Task<PurchaseItemEntity> GetPurchaseItemRencentlyByIngredientId(Guid IngredientId);
     }
 }
