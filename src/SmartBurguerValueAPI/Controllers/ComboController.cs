@@ -4,6 +4,7 @@ using SmartBurguerValueAPI.Context;
 using SmartBurguerValueAPI.DTOs.Products;
 using SmartBurguerValueAPI.Interfaces;
 using SmartBurguerValueAPI.Pagination;
+using System.Threading.Tasks;
 
 namespace SmartBurguerValueAPI.Controllers
 {
@@ -26,21 +27,9 @@ namespace SmartBurguerValueAPI.Controllers
             return Ok(Combos);
         }
         [HttpGet("get-all/by-enterprise-id")]
-        public async Task<ActionResult<IEnumerable<ComboDTO>>> GetAllComboByEnterprise(PaginationParamiters paramiters, Guid EnterpriseId)
+        public async Task<ActionResult<IEnumerable<ComboDTO>>> GetAllComboByEnterprise( Guid EnterpriseId)
         {
-            var Combos= await _unityOfWork.ComboRepository.GetAllCombosByEnterpriseIdAsync(paramiters, EnterpriseId);
-
-            var metadata = new
-            {
-                Combos.TotalCount,
-                Combos.PageSize,
-                Combos.CurrentPage,
-                Combos.TotalPages,
-                Combos.HasNext,
-                Combos.HasPrevius
-            };
-
-            Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
+            var Combos = await _unityOfWork.ComboRepository.GetAllCombosByEnterpriseIdAsync(EnterpriseId);
 
             return Ok(Combos);
         }
@@ -48,25 +37,25 @@ namespace SmartBurguerValueAPI.Controllers
         [HttpGet("get-by-id/")]
         public async Task<IActionResult> GetComboById(Guid comboId)
         {
-            var Combo = _unityOfWork.ProductRepository.GetByIdAsync(comboId);
+            var Combo = await _unityOfWork.ComboRepository.GetComboByIdAsync(comboId);
             return Ok(Combo);
         }
 
         [HttpPost("create")]
         public async Task<ActionResult<ComboDTO>> CreateCombo([FromBody] ComboDTO combo)
         {
-            var Combo = _unityOfWork.ComboRepository.CreateComboAsync(combo);
+            var Combo = await _unityOfWork.ComboRepository.CreateComboAsync(combo);
             await _unityOfWork.CommitAsync();
             return Ok(Combo);
         }
 
 
         [HttpPut("update/")]
-        public ActionResult Put([FromBody] ComboDTO combo)
+        public async Task<ActionResult> Put([FromBody] ComboDTO combo)
         {
-            var Combo = _unityOfWork.ComboRepository.CreateComboAsync(combo);
-            _unityOfWork.CommitAsync();
-            return Ok(Combo);
+            await _unityOfWork.ComboRepository.UpdateComboAsync(combo);
+            await _unityOfWork.CommitAsync();
+            return NoContent();
         }
 
         [HttpDelete("delete/{id:guid}")]

@@ -52,14 +52,20 @@ namespace SmartBurguerValueAPI.Context
 
             modelBuilder.Entity<ComboProductEntity>()
                 .HasOne(cp => cp.Combo)
-                .WithMany(c => c.ComboProducts)
+                .WithMany(c => c.Products)
                 .HasForeignKey(cp => cp.ComboId);
 
             modelBuilder.Entity<ComboProductEntity>()
                 .HasOne(cp => cp.Product)
                 .WithMany(p => p.ComboProducts)
                 .HasForeignKey(cp => cp.ProductId);
-          
+            
+            modelBuilder.Entity<ProductsEntity>()
+                .HasMany(p => p.ProductIngredients)
+                .WithOne(pi => pi.Product)
+                .HasForeignKey(pi => pi.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
         }
 
     }

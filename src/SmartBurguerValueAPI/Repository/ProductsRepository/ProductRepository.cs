@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using SmartBurguerValueAPI.Context;
@@ -15,17 +16,18 @@ namespace SmartBurguerValueAPI.Repository.ProductsRepository
 {
     public class ProductRepository : RepositoryBase<ProductsEntity>, IProductRepository
     {
-        private readonly IIngredientRepository _ingredientRepository;
-        private readonly IProductIngredientsRepository _productIngredientsRepository;
-        private readonly IProductRepository _productRepository;
-        private readonly IPurchaseRepository _PurchaseRepository;
-        public ProductRepository(AppDbContext context) : base(context)
+        private readonly IUnityOfWork _UnityOfWork;
+
+        public ProductRepository(AppDbContext context, IUnityOfWork unityOfWork) : base(context)
         {
+            _UnityOfWork = unityOfWork;
         }
+
         public async Task<List<ProductDTO>> GetAllProductsByEnterpriseId( Guid enterpriseId)
         {
             var query = _context.Products
                 .Where(x => x.EnterpriseId == enterpriseId)
+                .Include(i => i.ProductIngredients)
                 .OrderBy(x => x.Id)
                 .Select(x => new ProductDTO
                 {
@@ -37,10 +39,22 @@ namespace SmartBurguerValueAPI.Repository.ProductsRepository
                     SuggestedPrice = x.SuggestedPrice,
                     CPV = x.CPV,
                     CMV = x.CMV,
+                    Markup = x.Markup,
+                    Margin = x.Margin,
+                    ImageUrl = x.ImageUrl,
+                    EnterpriseId = enterpriseId,
+                    Ingredients = x.ProductIngredients.Select(i => new ProductIngredientDTO
+                    {
+                        Id = i.IngredientId,
+                        Name = i.Name,
+                        Quantity = i.QuantityUsedInBase,
+                        BaseUnit = i.Ingredient.UnitOfMeasure.BaseUnit
+                    }).ToList()
                 }).ToList();
 
             return query;
         }
+
         public async Task<Guid> CreateProductAsync(ProductDTO dto)
         {
             var product = new ProductsEntity
@@ -58,64 +72,90 @@ namespace SmartBurguerValueAPI.Repository.ProductsRepository
                 IsActive = true
             };
 
-            decimal totalCPV = 0;
+            decimal totalCost = 0;
 
             foreach (var item in dto.Ingredients)
             {
-                var ingredient = await _PurchaseRepository.GetPurchaseItemRencentlyByIngredientId(item.IngredientId);
-                if (ingredient == null)
-                    throw new Exception($"Ingredient not found: {item.IngredientId}");
+                var purchase = await _UnityOfWork.PurchaseItemRepository.GetPurchaseItemRencentlyByIngredientId(item.Id);
+                if (purchase == null)
+                    throw new Exception($"Purchase item not found for ingredient: {item.Id}");
 
-                var quantityInBase = item.Quantity * ingredient.UnityOfMensure.ConversionFactor;
-                var unitPrice = ingredient.UnitPrice / (ingredient.Quantity * ingredient.UnityOfMensure.ConversionFactor);
-
-                totalCPV += quantityInBase * unitPrice;
+                var cost = (purchase.UnitPrice * item.Quantity) / purchase.UnityOfMensure.ConversionFactor;
+                totalCost += cost;
 
                 var productIngredient = new ProductsIngredientsEntity
                 {
                     Id = Guid.NewGuid(),
+                    Name = item.Name,
                     ProductId = product.Id,
-                    IngredientId = item.IngredientId,
-                    QuantityUsedInBase = quantityInBase,
+                    IngredientId = item.Id,
+                    QuantityUsedInBase = item.Quantity,
                     DateCreated = DateTime.UtcNow,
                     DateUpdated = DateTime.UtcNow,
                     IsActive = true
                 };
 
-                await _productIngredientsRepository.Create(productIngredient);
+                await _UnityOfWork.ProductsIngredientRepository.Create(productIngredient);
             }
 
-            product.CPV = totalCPV;
+            product.CPV = totalCost;
 
-            if (product.DesiredMargin.HasValue && !product.SellingPrice.HasValue)
+            if (!product.SellingPrice.HasValue && product.DesiredMargin.HasValue && product.CPV.HasValue)
             {
-                product.SellingPrice = product.CPV.HasValue
-                    ? Math.Round(product.CPV.Value / (1m - product.DesiredMargin.Value), 2)
-                    : null;
+                var marginDecimal = product.DesiredMargin.Value / 100m;
+                product.SellingPrice = Math.Round(product.CPV.Value / (1m - marginDecimal), 2);
             }
-            else if (product.SellingPrice.HasValue && !product.DesiredMargin.HasValue)
+
+            if (!product.DesiredMargin.HasValue && product.SellingPrice.HasValue && product.CPV.HasValue)
             {
-                product.DesiredMargin = product.CPV.HasValue
-                    ? Math.Round(1m - (product.CPV.Value / product.SellingPrice.Value), 4)
-                    : null;
+                product.DesiredMargin = Math.Round((1m - (product.CPV.Value / product.SellingPrice.Value)) * 100m, 2);
             }
 
-            product.SuggestedPrice = (product.DesiredMargin.HasValue && product.CPV.HasValue)
-                ? Math.Round(product.CPV.Value / (1m - product.DesiredMargin.Value), 2)
-                : null;
-            product.CMV = (product.SellingPrice.HasValue && product.SellingPrice.Value != 0 && product.CPV.HasValue)
-                ? Math.Round(product.CPV.Value / product.SellingPrice.Value, 4)
-                : null;
+            if (product.DesiredMargin.HasValue && product.CPV.HasValue)
+            {
+                var marginDecimal = product.DesiredMargin.Value / 100m;
+                product.SuggestedPrice = Math.Round(product.CPV.Value / (1m - marginDecimal), 2);
+            }
+            else
+            {
+                product.SuggestedPrice = null;
+            }
 
+            if (product.SellingPrice.HasValue && product.CPV.HasValue && product.SellingPrice.Value > 0)
+            {
+                product.CMV = Math.Round((product.CPV.Value / product.SellingPrice.Value) * 100m, 2);
+            }
+            else
+            {
+                product.CMV = null;
+            }
 
-            await _productRepository.Create(product);
+            if (product.CPV.HasValue && product.CPV.Value > 0 && product.SellingPrice.HasValue)
+            {
+                product.Markup = Math.Round(((product.SellingPrice.Value / product.CPV.Value) - 1m), 2);
+            }
+            else
+            {
+                product.Markup = null;
+            }
+
+            if (product.SellingPrice.HasValue && product.SellingPrice.Value > 0 && product.CPV.HasValue)
+            {
+                product.Margin = Math.Round(((product.SellingPrice.Value - product.CPV.Value) / product.SellingPrice.Value) * 100m, 2);
+            }
+            else
+            {
+                product.Margin = null;
+            }
+
+            await _UnityOfWork.ProductRepository.Create(product);
 
             return product.Id;
         }
 
         public async Task UpdateProductAsync(ProductDTO dto)
         {
-            var product = await _productRepository.GetByIdAsync(dto.Id);
+            var product = await _UnityOfWork.ProductRepository.GetByIdAsync(dto.Id);
             if (product == null)
                 throw new Exception("Product not found");
 
@@ -127,59 +167,123 @@ namespace SmartBurguerValueAPI.Repository.ProductsRepository
             product.SuggestedPrice = dto.SuggestedPrice ?? product.SuggestedPrice;
             product.DateUpdated = DateTime.UtcNow;
 
-            await _productIngredientsRepository.RemoveAllByProductIdAsync(product.Id);
+            await _UnityOfWork.ProductsIngredientRepository.RemoveAllByProductIdAsync(product.Id);
 
-            decimal totalCPV = 0;
+            decimal totalCost = 0;
 
             foreach (var item in dto.Ingredients)
             {
-                var ingredient = await _PurchaseRepository.GetPurchaseItemRencentlyByIngredientId(item.IngredientId);
-                if (ingredient == null)
-                    throw new Exception($"Ingredient not found: {item.IngredientId}");
+                var purchase = await _UnityOfWork.PurchaseItemRepository.GetPurchaseItemRencentlyByIngredientId(item.Id);
+                if (purchase == null)
+                    throw new Exception($"Purchase item not found for ingredient: {item.Id}");
 
-                var quantityInBase = item.Quantity * ingredient.UnityOfMensure.ConversionFactor;
-                var unitPrice = ingredient.UnitPrice / (ingredient.Quantity * ingredient.UnityOfMensure.ConversionFactor);
-
-                totalCPV += quantityInBase * unitPrice;
+                var cost = (purchase.UnitPrice * item.Quantity) / purchase.UnityOfMensure.ConversionFactor;
+                totalCost += cost;
 
                 var productIngredient = new ProductsIngredientsEntity
                 {
                     Id = Guid.NewGuid(),
+                    Name = item.Name,
                     ProductId = product.Id,
-                    IngredientId = item.IngredientId,
-                    QuantityUsedInBase = quantityInBase,
+                    IngredientId = item.Id,
+                    QuantityUsedInBase = item.Quantity,
                     DateCreated = DateTime.UtcNow,
                     DateUpdated = DateTime.UtcNow,
                     IsActive = true
                 };
 
-                await _productIngredientsRepository.AddAsync(productIngredient);
+                await _UnityOfWork.ProductsIngredientRepository.AddAsync(productIngredient);
             }
 
-            product.CPV = totalCPV;
+            product.CPV = totalCost;
 
-            if (product.DesiredMargin.HasValue && !product.SellingPrice.HasValue)
+            if (!product.SellingPrice.HasValue && product.DesiredMargin.HasValue && product.CPV.HasValue)
             {
-                product.SellingPrice = product.CPV.HasValue
-                    ? Math.Round(product.CPV.Value / (1m - product.DesiredMargin.Value), 2)
-                    : null;
+                var marginDecimal = product.DesiredMargin.Value / 100m;
+                product.SellingPrice = Math.Round(product.CPV.Value / (1m - marginDecimal), 2);
             }
-            else if (product.SellingPrice.HasValue && !product.DesiredMargin.HasValue)
+
+            if (!product.DesiredMargin.HasValue && product.SellingPrice.HasValue && product.CPV.HasValue)
             {
-                product.DesiredMargin = product.CPV.HasValue
-                    ? Math.Round(1m - (product.CPV.Value / product.SellingPrice.Value), 4)
-                    : null;
+                product.DesiredMargin = Math.Round((1m - (product.CPV.Value / product.SellingPrice.Value)) * 100m, 2);
             }
 
-            product.SuggestedPrice = (product.DesiredMargin.HasValue && product.CPV.HasValue)
-                ? Math.Round(product.CPV.Value / (1m - product.DesiredMargin.Value), 2)
-                : null;
-            product.CMV = (product.SellingPrice.HasValue && product.SellingPrice.Value != 0 && product.CPV.HasValue)
-                ? Math.Round(product.CPV.Value / product.SellingPrice.Value, 4)
-                : null;
+            if (product.DesiredMargin.HasValue && product.CPV.HasValue)
+            {
+                var marginDecimal = product.DesiredMargin.Value / 100m;
+                product.SuggestedPrice = Math.Round(product.CPV.Value / (1m - marginDecimal), 2);
+            }
+            else
+            {
+                product.SuggestedPrice = null;
+            }
 
-            _productRepository.Update(product);
+            if (product.SellingPrice.HasValue && product.CPV.HasValue && product.SellingPrice.Value > 0)
+            {
+                product.CMV = Math.Round((product.CPV.Value / product.SellingPrice.Value) * 100m, 2);
+            }
+            else
+            {
+                product.CMV = null;
+            }
 
+            if (product.CPV.HasValue && product.CPV.Value > 0 && product.SellingPrice.HasValue)
+            {
+                product.Markup = Math.Round(((product.SellingPrice.Value / product.CPV.Value) - 1m), 2);
+            }
+            else
+            {
+                product.Markup = null;
+            }
+
+            if (product.SellingPrice.HasValue && product.SellingPrice.Value > 0 && product.CPV.HasValue)
+            {
+                product.Margin = Math.Round(((product.SellingPrice.Value - product.CPV.Value) / product.SellingPrice.Value) * 100m, 2);
+            }
+            else
+            {
+                product.Margin = null;
+            }
+
+            _UnityOfWork.ProductRepository.Update(product);
+        }
+
+        public async Task<ProductDTO> GetByIdWithIngredientsAsync(Guid productId)
+        {
+            var productEntity = await _context.Products
+                .Include(p => p.ProductIngredients)
+                 .ThenInclude(pi => pi.Ingredient.UnitOfMeasure)
+                .FirstOrDefaultAsync(p => p.Id == productId);
+
+            if (productEntity == null)
+                return null;
+
+            var productDto = new ProductDTO
+            {
+                Id = productEntity.Id,
+                Name = productEntity.Name,
+                Description = productEntity.Description,
+                EnterpriseId = productEntity.EnterpriseId,
+                ImageUrl = productEntity.ImageUrl,
+                DesiredMargin = productEntity.DesiredMargin,
+                SellingPrice = productEntity.SellingPrice,
+                SuggestedPrice = productEntity.SuggestedPrice,
+                CPV  = productEntity.CPV,
+                CMV = productEntity.CMV,
+                Margin =productEntity.Margin,
+                Markup = productEntity.Markup,
+                DateCreated = DateTime.UtcNow,
+                DateUpdate = DateTime.UtcNow,
+                Ingredients = productEntity.ProductIngredients.Select(i => new ProductIngredientDTO
+                {
+                    Id = i.IngredientId,
+                    Name = i.Name,
+                    Quantity = i.QuantityUsedInBase, 
+                    BaseUnit = i.Ingredient.UnitOfMeasure.BaseUnit,
+                }).ToList()
+            };
+
+            return productDto;
         }
 
     }

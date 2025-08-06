@@ -8,7 +8,8 @@ namespace SmartBurguerValueAPI.Interfaces.IProducts
 {
     public interface IComboRepository : IRepositoryBase<ComboEntity>
     {
-        Task<PagedList<ComboDTO>> GetAllCombosByEnterpriseIdAsync(PaginationParamiters paramiters, Guid EnterpriseId);
+        Task<ComboDTO> GetComboByIdAsync(Guid comboId);
+        Task<List<ComboDTO>> GetAllCombosByEnterpriseIdAsync(Guid EnterpriseId);
         Task<Guid> CreateComboAsync(ComboDTO dto);
         Task UpdateComboAsync(ComboDTO dto);
     }

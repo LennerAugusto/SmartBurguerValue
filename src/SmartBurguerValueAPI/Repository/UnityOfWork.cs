@@ -14,6 +14,7 @@ namespace SmartBurguerValueAPI.Repository
         public IIngredientRepository? _IngredientRep;
         public IProductIngredientsRepository? _ProductIngredientsRep;
         public IComboRepository? _ComboRep;
+        public IComboProductRepository? _ComboProductRep;
         public IFixedCoastRepository? _FixedCoastRep;
         public ISalesGoalRepository _SalesGoalRep;
         public IDailyEntryRepository _DailyEntryRep;
@@ -21,6 +22,7 @@ namespace SmartBurguerValueAPI.Repository
         public IEmployeeRepository _EmployeeRep;
         public IEmployeeWorkScheduleRepository _EmployeeWorkRep;
         public IPurchaseRepository _PurchaseRep;
+        public IPurchaseItemRepository _PurchaseItemRep;
         public IFinancialSnapshotsRepository _FinancialSnapshotsRep;
         public IProductCostAnalysisRepository _ProductCostAnalysisRep;
 
@@ -32,7 +34,7 @@ namespace SmartBurguerValueAPI.Repository
         }
         public IProductRepository ProductRepository
         {
-            get{return _ProductRep = _ProductRep ?? new ProductRepository(_context);}
+            get{return _ProductRep = _ProductRep ?? new ProductRepository(_context, this);}
         }
         public IEnterpriseRepository EnterpriseRepository
         {
@@ -52,7 +54,11 @@ namespace SmartBurguerValueAPI.Repository
         }
         public IComboRepository ComboRepository
         {
-            get { return _ComboRep = _ComboRep ?? new ComboRepository(_context); }
+            get { return _ComboRep = _ComboRep ?? new ComboRepository(this, _context); }
+        }
+        public IComboProductRepository ComboProductRepository
+        {
+            get { return _ComboProductRep = _ComboProductRep ?? new ComboProductRepository(_context); }
         }
         public IFixedCoastRepository FixedCoastRepository
         {
@@ -80,7 +86,11 @@ namespace SmartBurguerValueAPI.Repository
         }
         public IPurchaseRepository PurchaseRepository
         {
-            get { return _PurchaseRep = _PurchaseRep ?? new PurchaseRepository(_context); }
+            get { return _PurchaseRep = _PurchaseRep ?? new PurchaseRepository(_context, this); }
+        }
+        public IPurchaseItemRepository PurchaseItemRepository
+        {
+            get { return _PurchaseItemRep = _PurchaseItemRep ?? new PurchaseItemRepository(_context); }
         }
         public IFinancialSnapshotsRepository FinancialSnapshotsRepository
         {

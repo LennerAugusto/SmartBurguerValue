@@ -11,5 +11,6 @@ namespace SmartBurguerValueAPI.IRepository.IProducts
         Task<List<ProductDTO>> GetAllProductsByEnterpriseId(Guid EnterpriseId);
         Task<Guid> CreateProductAsync(ProductDTO dto);
         Task UpdateProductAsync(ProductDTO dto);
+        Task<ProductDTO> GetByIdWithIngredientsAsync(Guid productId);
     }
 }

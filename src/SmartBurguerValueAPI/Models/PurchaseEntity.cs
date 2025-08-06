@@ -6,7 +6,7 @@ namespace SmartBurguerValueAPI.Models
     {
 
         public string SupplierName { get; set; }
-        [Column(TypeName = "decimal(18,2)")]
+        [Column(TypeName = "decimal(10,2)")]
         public decimal TotalAmount { get; set; }
         public DateTime PurchaseDate { get; set; }
         public Guid EnterpriseId { get; set; }

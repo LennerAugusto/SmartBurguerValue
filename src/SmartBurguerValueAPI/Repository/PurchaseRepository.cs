@@ -11,8 +11,10 @@ namespace SmartBurguerValueAPI.Repository
 {
     public class PurchaseRepository : RepositoryBase<PurchaseEntity>, IPurchaseRepository
     {
-        public PurchaseRepository(AppDbContext context) : base(context)
+        private readonly IUnityOfWork _UnityOfWork;
+        public PurchaseRepository(AppDbContext context, IUnityOfWork unityOfWork) : base(context)
         {
+            _UnityOfWork = unityOfWork;
         }
         public async Task<List<PurchaseDTO>> GetAllPurchasesByEnterpriseId(Guid enterpriseId)
         {
@@ -68,14 +70,61 @@ namespace SmartBurguerValueAPI.Repository
             _context.Purchase.Add(entity);
             await _context.SaveChangesAsync();
 
+            await UpdateProductsAsync(dto.EnterpriseId, dto);
+            await UpdateComboAsync(dto.EnterpriseId, dto);
             return entity;
         }
-        public async Task<PurchaseItemEntity> GetPurchaseItemRencentlyByIngredientId(Guid IngredientId)
+
+        public async Task UpdateProductsAsync(Guid enterpriseId, PurchaseDTO purchase)
         {
-            return await _context.PurchaseItem
-                .Where(x => x.IngredientId == IngredientId)
-                .OrderByDescending(x => x.DateCreated)
-                .FirstOrDefaultAsync();
+            var products = await _UnityOfWork.ProductRepository.GetAllProductsByEnterpriseId(enterpriseId);
+
+            foreach (var product in products)
+            { 
+                if (product.Ingredients == null || !product.Ingredients.Any())
+                    continue;
+
+                var matchedIngredients = product.Ingredients
+                    .Where(ingredient => purchase.PurchaseItems
+                        .Any(purchaseItem => purchaseItem.IngredientId == ingredient.Id))
+                    .ToList();
+
+                if (matchedIngredients != null)
+                {
+                  await _UnityOfWork.ProductRepository.UpdateProductAsync(product);
+                }
+            }
+
         }
+        public async Task UpdateComboAsync(Guid enterpriseId, PurchaseDTO purchase)
+        {
+            var combos = await _UnityOfWork.ComboRepository.GetAllCombosByEnterpriseIdAsync(enterpriseId);
+
+            foreach (var combo in combos)
+            {
+                if (combo.Products == null || !combo.Products.Any())
+                    continue;
+
+                foreach (var product in combo.Products)
+                {
+                    if (product.Ingredients == null || !product.Ingredients.Any())
+                        continue;
+
+                    foreach (var ingredient in product.Ingredients)
+                    {
+                        var purchaseItem = purchase.PurchaseItems
+                            .Where(p => p.IngredientId == ingredient.Id);
+
+                        if (purchaseItem != null)
+                        {
+                           await _UnityOfWork.ComboRepository.UpdateComboAsync(combo);
+                        }
+                    }
+                }
+
+            }
+
+        }
+
     }
 }

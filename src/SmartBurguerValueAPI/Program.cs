@@ -228,6 +228,7 @@ builder.Services.AddScoped<IDailyEntryRepository, DailyEntryRepository>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IEmployeeWorkScheduleRepository, EmployeeWorkScheduleRepository>();
 builder.Services.AddScoped<IPurchaseRepository, PurchaseRepository>();
+builder.Services.AddScoped<IPurchaseItemRepository, PurchaseItemRepository>();
 builder.Services.AddScoped<IFinancialSnapshotsRepository, FinancialSnapshotsRepository>();
 builder.Services.AddScoped<IProductCostAnalysisRepository, ProductCostAnalysisRepository>();
 

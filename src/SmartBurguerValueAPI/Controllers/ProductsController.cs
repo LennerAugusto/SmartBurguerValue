@@ -35,25 +35,30 @@ namespace SmartBurguerValueAPI.Controllers
         [HttpGet("get-by-id/")]
         public async Task<IActionResult> GetProductById(Guid ProductId)
         {
-            var Products = _unityOfWork.ProductRepository.GetByIdAsync(ProductId);
+            var Products = await _unityOfWork.ProductRepository.GetByIdAsync(ProductId);
             return Ok(Products);
         }
-
-        [HttpPost("create")]
-        public async Task<ActionResult<ProductDTO>> CreateProduct([FromBody] ProductDTO product)
+        [HttpGet("get-by-id/with-ingredients")]
+        public async Task<ProductDTO> GetProductByWhiteIngredientsId(Guid ProductId)
         {
-            var Product = _unityOfWork.ProductRepository.CreateProductAsync(product);
+            var Products = await _unityOfWork.ProductRepository.GetByIdWithIngredientsAsync(ProductId);
+            return Products;
+        }
+        [HttpPost("create")]
+        public async Task<ActionResult<Guid>> CreateProduct([FromBody] ProductDTO product)
+        {
+            var Product = await _unityOfWork.ProductRepository.CreateProductAsync(product);
             await _unityOfWork.CommitAsync();
             return Ok(Product);
         }
 
 
         [HttpPut("update/")]
-        public ActionResult Put([FromBody] ProductDTO product)
+        public async Task<ActionResult<Guid>> Put([FromBody] ProductDTO product)
         {
-            var Product = _unityOfWork.ProductRepository.UpdateProductAsync(product);
-            _unityOfWork.CommitAsync();
-            return Ok(Product);
+            await _unityOfWork.ProductRepository.UpdateProductAsync(product);
+            await _unityOfWork.CommitAsync();
+            return Ok();
         }
 
         [HttpDelete("delete/{id:guid}")]

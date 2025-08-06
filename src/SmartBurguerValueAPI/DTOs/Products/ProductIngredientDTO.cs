@@ -2,7 +2,9 @@
 {
     public class ProductIngredientDTO
     {
-        public Guid IngredientId { get; set; }
+        public string Name { get; set; }
+        public string BaseUnit { get; set; }
+        public Guid Id { get; set; }
         public decimal Quantity { get; set; } 
     }
 }

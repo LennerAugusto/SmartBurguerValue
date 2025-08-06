@@ -9,6 +9,7 @@ namespace SmartBurguerValueAPI.Models.Products
         public string Name { get; set; }
         public string Symbol { get; set; }
         public string BaseUnit { get; set; }
+        [Column(TypeName = "decimal(10,2)")]
         public decimal ConversionFactor { get; set; }
         [JsonIgnore]
         public ICollection<IngredientsEntity> Ingredients { get; set; }

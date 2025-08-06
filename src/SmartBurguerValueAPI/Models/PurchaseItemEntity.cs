@@ -16,7 +16,7 @@ namespace SmartBurguerValueAPI.Models
         public UnityTypesProductsEntity UnityOfMensure { get; set; }
         [Column(TypeName = "decimal(18,0)")]
         public decimal Quantity { get; set; }
-        [Column(TypeName = "decimal(18,2)")]
+        [Column(TypeName = "decimal(10,2)")]
         public decimal UnitPrice { get; set; }
     }
 }

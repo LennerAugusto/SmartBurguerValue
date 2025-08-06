@@ -11,6 +11,7 @@ namespace SmartBurguerValueAPI.Interfaces
         IIngredientRepository IngredientRepository { get; }
         IProductIngredientsRepository ProductsIngredientRepository { get; }
         IComboRepository ComboRepository { get; }
+        IComboProductRepository ComboProductRepository { get; }
         IFixedCoastRepository FixedCoastRepository { get; }
         ISalesGoalRepository SalesGoalRepository { get; }
         IDailyEntryRepository DailyEntryRepository { get; }
@@ -18,6 +19,7 @@ namespace SmartBurguerValueAPI.Interfaces
         IEmployeeRepository EmployeeRepository { get; }
         IEmployeeWorkScheduleRepository EmployeeWorkScheduleRepository { get; }
         IPurchaseRepository PurchaseRepository { get; }
+        IPurchaseItemRepository PurchaseItemRepository { get; }
         IFinancialSnapshotsRepository FinancialSnapshotsRepository { get; }
         IProductCostAnalysisRepository ProductCostAnalysisRepository { get; }
         Task CommitAsync();
