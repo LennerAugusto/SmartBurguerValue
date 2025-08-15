@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SmartBurguerValueAPI.Context;
 using SmartBurguerValueAPI.DTOs.Products;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace SmartBurguerValueAPI.Controllers
 {
+    //[Authorize(Policy = "Enterprise")]
     [Microsoft.AspNetCore.Mvc.Route("api/combo")]
     public class ComboController : ControllerBase
     {

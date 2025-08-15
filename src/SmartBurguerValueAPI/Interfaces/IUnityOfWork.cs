@@ -22,6 +22,7 @@ namespace SmartBurguerValueAPI.Interfaces
         IPurchaseItemRepository PurchaseItemRepository { get; }
         IFinancialSnapshotsRepository FinancialSnapshotsRepository { get; }
         IProductCostAnalysisRepository ProductCostAnalysisRepository { get; }
+        IAnalysisByPeriodRepository AnalysisByPeriodRepository { get; }
         Task CommitAsync();
     }
 }

@@ -9,6 +9,7 @@ using SmartBurguerValueAPI.Pagination;
 
 namespace SmartBurguerValueAPI.Controllers
 {
+    //[Authorize(Policy = "Enterprise")]
     [Microsoft.AspNetCore.Mvc.Route("api/purchase")]
     public class PurchaseController : ControllerBase
     {

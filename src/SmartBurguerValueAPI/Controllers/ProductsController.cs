@@ -12,6 +12,7 @@ using SmartBurguerValueAPI.Pagination;
 
 namespace SmartBurguerValueAPI.Controllers
 {
+    //[Authorize(Policy = "Enterprise")]
     [Route("api/products")]
     public class ProductsController : ControllerBase
     {

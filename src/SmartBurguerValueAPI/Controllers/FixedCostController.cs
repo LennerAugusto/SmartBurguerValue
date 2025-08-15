@@ -10,6 +10,7 @@ using SmartBurguerValueAPI.Pagination;
 
 namespace SmartBurguerValueAPI.Controllers
 {
+    //[Authorize(Policy = "Enterprise")]
     [Route("api/fixed-coast")]
     public class FixedCostController : ControllerBase
     {

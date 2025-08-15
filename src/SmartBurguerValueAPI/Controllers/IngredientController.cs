@@ -10,6 +10,7 @@ using SmartBurguerValueAPI.Pagination;
 
 namespace SmartBurguerValueAPI.Controllers
 {
+    //[Authorize(Policy = "Enterprise")]
     [Microsoft.AspNetCore.Mvc.Route("api/ingredient")]
     public class IngredientController : Controller
     {

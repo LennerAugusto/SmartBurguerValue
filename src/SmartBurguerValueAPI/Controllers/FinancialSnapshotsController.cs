@@ -5,7 +5,7 @@ using SmartBurguerValueAPI.Models;
 
 namespace SmartBurguerValueAPI.Controllers
 {
-
+    //[Authorize(Policy = "Enterprise")]
     [Microsoft.AspNetCore.Mvc.Route("api/financial-snapshots")]
     public class FinancialSnapshotsController: ControllerBase
     {

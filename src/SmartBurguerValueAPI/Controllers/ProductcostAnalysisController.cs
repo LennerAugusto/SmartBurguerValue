@@ -7,6 +7,7 @@ using SmartBurguerValueAPI.Models;
 
 namespace SmartBurguerValueAPI.Controllers
 {
+    //[Authorize(Policy = "Enterprise")]
     [Microsoft.AspNetCore.Mvc.Route("api/product-analyses")]
     public class ProductcostAnalysisController : Microsoft.AspNetCore.Mvc.ControllerBase
     {

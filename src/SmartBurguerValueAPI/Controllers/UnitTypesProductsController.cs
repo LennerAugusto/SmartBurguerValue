@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace SmartBurguerValueAPI.Controllers
 {
-    //[Authorize(Policy = "Enterprise")]
+    //[Authorize(Policy = "Admin")]
     [Route("api/unit-types")]
     public class UnitTypesProductsController : ControllerBase
     {

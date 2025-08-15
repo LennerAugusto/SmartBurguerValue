@@ -9,6 +9,7 @@ using SmartBurguerValueAPI.Models;
 
 namespace SmartBurguerValueAPI.Controllers
 {
+    //[Authorize(Policy = "Admin")]
     [Microsoft.AspNetCore.Mvc.Route("api/enterprise")]
     public class EnteprisesController : ControllerBase
     {

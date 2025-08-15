@@ -11,11 +11,11 @@ namespace SmartBurguerValueAPI.Mappings
     {
         public MappingProfile()
         {
-            /*UnityTypesProducts*/
             CreateMap<BaseDTO, UnityTypesProductsEntity>().ReverseMap();
             CreateMap<IngredientDTO, IngredientsEntity>().ReverseMap();
             CreateMap<EmployeeDTO, EmployeeEntity>().ReverseMap();
             CreateMap<WorkScheduleDTO, EmployeeWorkScheduleEntity>().ReverseMap();
+            CreateMap<DailyEntryDTO, DailyEntryItemEntity>().ReverseMap();
         }
     }
 }

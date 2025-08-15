@@ -231,7 +231,7 @@ builder.Services.AddScoped<IPurchaseRepository, PurchaseRepository>();
 builder.Services.AddScoped<IPurchaseItemRepository, PurchaseItemRepository>();
 builder.Services.AddScoped<IFinancialSnapshotsRepository, FinancialSnapshotsRepository>();
 builder.Services.AddScoped<IProductCostAnalysisRepository, ProductCostAnalysisRepository>();
-
+builder.Services.AddScoped<IAnalysisByPeriodRepository, AnalysisByPeriodRepository>();  
 // =====================
 // Serviços auxiliares
 // =====================

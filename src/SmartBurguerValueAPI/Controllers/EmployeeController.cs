@@ -9,6 +9,7 @@ using SmartBurguerValueAPI.Pagination;
 
 namespace SmartBurguerValueAPI.Controllers
 {
+    //[Authorize(Policy = "Enterprise")]
     [Route("api/employee")]
     public class EmployeeController : ControllerBase
     {
