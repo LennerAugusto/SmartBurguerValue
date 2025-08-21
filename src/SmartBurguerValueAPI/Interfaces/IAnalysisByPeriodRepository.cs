@@ -7,5 +7,6 @@ namespace SmartBurguerValueAPI.Interfaces
     public interface IAnalysisByPeriodRepository
     {
         Task<InitialAnalysiDTO> GetInitialAnalysisByPeriod(EPeriod Period, Guid EntepriseId);
+        Task<List<BestSellingProductsDTO>> GetBestSellingProductsByEnterpriseId(EPeriod Period, Guid EntepriseId);
     }
 }

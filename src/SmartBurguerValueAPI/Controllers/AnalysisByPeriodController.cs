@@ -20,12 +20,17 @@ namespace SmartBurguerValueAPI.Controllers
             _unityOfWork = unityOfWork;
         }
 
-        [HttpPost("get-all")]
+        [HttpPost("analysis-home/get-all")]
         public async Task<ActionResult<IEnumerable<InitialAnalysiDTO>>> GetAnalyseHome([FromBody]AnalysisRequestDTO analysis)
         {
             var Combos = await _unityOfWork.AnalysisByPeriodRepository.GetInitialAnalysisByPeriod(analysis.Period, analysis.EnterpriseId);
             return Ok(Combos);
         }
-        
+        [HttpPost("best-selling-products/by-enterprise-id")]
+        public async Task<ActionResult<IEnumerable<BestSellingProductsDTO>>> GetBestSellingProducts([FromBody] AnalysisRequestDTO analysis)
+        {
+            var Products = await _unityOfWork.AnalysisByPeriodRepository.GetBestSellingProductsByEnterpriseId(analysis.Period, analysis.EnterpriseId);
+            return Ok(Products);
+        }
     }
 }

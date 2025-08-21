@@ -16,7 +16,7 @@ namespace SmartBurguerValueAPI.Repository
             _context = context;
         }
 
-        public async Task<InitialAnalysiDTO> GetInitialAnalysisByPeriod(EPeriod period, Guid enterpriseId)
+        private DateTime SelectPeriod(EPeriod period)
         {
             DateTime startDate = period switch
             {
@@ -27,7 +27,12 @@ namespace SmartBurguerValueAPI.Repository
                 EPeriod.LastWeek => DateTime.Now.AddDays(-7),
                 _ => DateTime.MinValue
             };
+            return startDate;
+        }
+        public async Task<InitialAnalysiDTO> GetInitialAnalysisByPeriod(EPeriod period, Guid enterpriseId)
+        {
 
+            DateTime startDate = SelectPeriod(period);
             DateTime endDate = DateTime.UtcNow;
 
             var query = _context.DailyEntry
@@ -50,6 +55,33 @@ namespace SmartBurguerValueAPI.Repository
             };
         }
 
+        public async Task<List<BestSellingProductsDTO>> GetBestSellingProductsByEnterpriseId(EPeriod period, Guid enterpriseId)
+        {
+            DateTime startDate = SelectPeriod(period);
+            DateTime endDate = DateTime.UtcNow;
+
+            var query = _context.DailyEntry
+                .Include(x => x.Items)
+                .Where(x => x.EntryDate >= startDate
+                         && x.EntryDate <= endDate
+                         && x.EnterpriseId == enterpriseId);
+
+            var result = await query
+                .SelectMany(x => x.Items) 
+                .GroupBy(i => i.ProductId) 
+                .Select(g => new BestSellingProductsDTO
+                {
+                    ProductId = g.Key,
+                    Name = g.FirstOrDefault().Product.Name, 
+                    Quantity = g.Sum(i => i.Quantity),
+                    SellingPrice = g.FirstOrDefault().SellingPrice,
+                    ImageUrl = g.FirstOrDefault().Product.ImageUrl
+                })
+                .OrderByDescending(x => x.Quantity) 
+                .ToListAsync();
+
+            return result;
+        }
 
     }
 }
