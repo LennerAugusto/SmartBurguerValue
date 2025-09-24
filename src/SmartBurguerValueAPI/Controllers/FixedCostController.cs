@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SmartBurguerValueAPI.Context;
 using SmartBurguerValueAPI.DTOs;
@@ -16,11 +17,12 @@ namespace SmartBurguerValueAPI.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IUnityOfWork _unityOfWork;
-
-        public FixedCostController(AppDbContext context, IUnityOfWork unityOfWork)
+        private readonly IMapper _map;
+        public FixedCostController(AppDbContext context, IUnityOfWork unityOfWork, IMapper map)
         {
             _context = context;
             _unityOfWork = unityOfWork;
+            _map = map;
         }
         [HttpGet("get-all")]
         public async Task<ActionResult<IEnumerable<FixedCoastDTO>>> GetAllFixedCoasts()
@@ -29,35 +31,23 @@ namespace SmartBurguerValueAPI.Controllers
             return Ok(FixedCoasts);
         }
         [HttpGet("get-all/by-enterprise-id")]
-        public async Task<ActionResult<IEnumerable<FixedCoastDTO>>> GetAllFixedCoastByEnterpriseId(PaginationParamiters paramiters, Guid EnterpriseId)
+        public async Task<ActionResult<IEnumerable<FixedCoastDTO>>> GetAllFixedCoastByEnterpriseId(Guid EnterpriseId)
         {
-            var FixedCoasts = await _unityOfWork.FixedCoastRepository.GetAllFixedCostByEnterpriseId(paramiters, EnterpriseId);
-
-            var metadata = new
-            {
-                FixedCoasts.TotalCount,
-                FixedCoasts.PageSize,
-                FixedCoasts.CurrentPage,
-                FixedCoasts.TotalPages,
-                FixedCoasts.HasNext,
-                FixedCoasts.HasPrevius
-            };
-
-            Response.Headers.Append("X-Pagination", JsonConvert.SerializeObject(metadata));
-
+            var FixedCoasts = await _unityOfWork.FixedCoastRepository.GetAllFixedCostByEnterpriseId(EnterpriseId);
             return Ok(FixedCoasts);
         }
         [HttpGet("get-by-id/")]
         public async Task<IActionResult> GetFixedCoastById(Guid FixedCoastId)
         {
-            var FixedCoast = _unityOfWork.FixedCoastRepository.GetByIdAsync(FixedCoastId);
+            var FixedCoast = await _unityOfWork.FixedCoastRepository.GetByIdAsync(FixedCoastId);
             return Ok(FixedCoast);
         }
         
         [HttpPost("create")]
         public async Task<ActionResult<FixedCoastDTO>> CreateFixedCoast([FromBody] FixedCostEntity fixedCoast)
         {
-            var FixedCoast = _unityOfWork.FixedCoastRepository.Create(fixedCoast);
+            //var FixedCoast = _map.Map<FixedCostEntity>(fixedCoast);
+            var FixedCoast =  _unityOfWork.FixedCoastRepository.Create(fixedCoast);
             await _unityOfWork.CommitAsync();
             return Ok(FixedCoast);
         }

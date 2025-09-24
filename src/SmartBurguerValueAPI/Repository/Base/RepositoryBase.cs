@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using SmartBurguerValueAPI.Context;
 using SmartBurguerValueAPI.IRepository.IRepositoryBase;
 using SmartBurguerValueAPI.Models;
@@ -9,7 +10,6 @@ namespace SmartBurguerValueAPI.Repository.Base
     public class RepositoryBase<T> : IRepositoryBase<T> where T : BaseEntity
     {
         protected AppDbContext _context;
-
         public RepositoryBase(AppDbContext context)
         {
             _context = context;

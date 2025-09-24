@@ -6,6 +6,7 @@ namespace SmartBurguerValueAPI.Models
     {
         public DateTime EntryDate { get; set; }
         public string? Description { get; set; }
+        public int? TotalOrders { get; set; }
         public Guid EnterpriseId { get; set; }
         [JsonIgnore]
         public ICollection<DailyEntryItemEntity> Items { get; set; }

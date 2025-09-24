@@ -47,6 +47,7 @@ namespace SmartBurguerValueAPI.Controllers
                 EntryDate = dto.EntryDate,
                 Description = dto.Description,
                 EnterpriseId = dto.EnterpriseId,
+                TotalOrders = dto.TotalOrders ?? 0,  
                 IsActive = dto.IsActive,
                 DateCreated = dto.DateCreated ?? DateTime.UtcNow,
                 DateUpdated = dto.DateUpdated ?? DateTime.UtcNow,

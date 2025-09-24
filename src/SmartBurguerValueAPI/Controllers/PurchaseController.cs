@@ -31,7 +31,7 @@ namespace SmartBurguerValueAPI.Controllers
         [HttpGet("get-by-id/")]
         public async Task<IActionResult> GetPurchaseById(Guid PurchaseId)
         {
-            var Purchase = await _unityOfWork.PurchaseRepository.GetByIdAsync(PurchaseId);
+            var Purchase = await _unityOfWork.PurchaseRepository.GetPurchaseById(PurchaseId);
             return Ok(Purchase);
         }
 
@@ -45,9 +45,9 @@ namespace SmartBurguerValueAPI.Controllers
 
 
         [HttpPut("update/")]
-        public async Task<ActionResult> Put([FromBody] PurchaseEntity purchase)
+        public async Task<ActionResult> Put([FromBody] PurchaseDTO purchase)
         {
-            _unityOfWork.PurchaseRepository.Update(purchase);
+            await _unityOfWork.PurchaseRepository.UpdatePurchaseAsync(purchase);
             await _unityOfWork.CommitAsync();
             return Ok(purchase);
         }

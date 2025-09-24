@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using SmartBurguerValueAPI.Context;
 using SmartBurguerValueAPI.DTOs;
 using SmartBurguerValueAPI.DTOs.Products;
@@ -11,23 +12,18 @@ namespace SmartBurguerValueAPI.Repository
 {
     public class FixedCoastRepository : RepositoryBase<FixedCostEntity>, IFixedCoastRepository
     {
-        public FixedCoastRepository(AppDbContext context) : base(context)
+        private readonly IMapper _map;
+        public FixedCoastRepository(AppDbContext context, IMapper map) : base(context)
         {
+            _map = map;
         }
-        public async Task<PagedList<FixedCoastDTO>> GetAllFixedCostByEnterpriseId(PaginationParamiters paramiters, Guid enterpriseId)
+        public async Task<List<FixedCoastDTO>> GetAllFixedCostByEnterpriseId(Guid enterpriseId)
         {
-            var query = _context.Set<FixedCoastDTO>() // ou Set<FixedCostEntity>() se preferir
+            var query = _context.Set<FixedCostEntity>()
                 .Where(x => x.EnterpriseId == enterpriseId)
-                .AsNoTracking()
-                .Select(x => new FixedCoastDTO
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    Value = x.Value,
-                    EnterpriseId = x.EnterpriseId
-                });
-
-            return PagedList<FixedCoastDTO>.ToPagedList(query, paramiters.PageNumber, paramiters.PageSize);
+                .AsNoTracking();
+                
+            return _map.Map<List<FixedCoastDTO>>(query);
         }
     }
 }

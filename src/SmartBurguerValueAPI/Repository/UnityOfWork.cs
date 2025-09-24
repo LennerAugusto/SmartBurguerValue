@@ -1,4 +1,5 @@
-﻿using SmartBurguerValueAPI.Context;
+﻿using AutoMapper;
+using SmartBurguerValueAPI.Context;
 using SmartBurguerValueAPI.Interfaces;
 using SmartBurguerValueAPI.Interfaces.IProducts;
 using SmartBurguerValueAPI.IRepository.IProducts;
@@ -8,6 +9,7 @@ namespace SmartBurguerValueAPI.Repository
 {
     public class UnityOfWork : IUnityOfWork
     {
+        private readonly IMapper _map;
         public IProductRepository? _ProductRep;
         public IEnterpriseRepository? _EnterpriseRep;
         public IUnityTypesRepository? _UnityTypesRep;
@@ -28,9 +30,10 @@ namespace SmartBurguerValueAPI.Repository
         public IAnalysisByPeriodRepository _AnalysisByPeriodRep;
         public AppDbContext _context;
 
-        public UnityOfWork(AppDbContext context)
+        public UnityOfWork(AppDbContext context, IMapper mapper)
         {
             _context = context;
+            _map = mapper;
         }
         public IProductRepository ProductRepository
         {
@@ -62,7 +65,7 @@ namespace SmartBurguerValueAPI.Repository
         }
         public IFixedCoastRepository FixedCoastRepository
         {
-            get { return _FixedCoastRep = _FixedCoastRep ?? new FixedCoastRepository(_context); }
+            get { return _FixedCoastRep = _FixedCoastRep ?? new FixedCoastRepository(_context, _map); }
         }
         public ISalesGoalRepository SalesGoalRepository
         {
@@ -86,7 +89,7 @@ namespace SmartBurguerValueAPI.Repository
         }
         public IPurchaseRepository PurchaseRepository
         {
-            get { return _PurchaseRep = _PurchaseRep ?? new PurchaseRepository(_context, this); }
+            get { return _PurchaseRep = _PurchaseRep ?? new PurchaseRepository(_context, this, _map); }
         }
         public IPurchaseItemRepository PurchaseItemRepository
         {

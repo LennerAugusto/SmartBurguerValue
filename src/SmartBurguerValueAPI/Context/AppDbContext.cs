@@ -65,7 +65,21 @@ namespace SmartBurguerValueAPI.Context
                 .WithOne(pi => pi.Product)
                 .HasForeignKey(pi => pi.ProductId)
                 .OnDelete(DeleteBehavior.Cascade);
-
+            modelBuilder.Entity<ProductsEntity>()
+                .HasMany(p => p.DailyEntryItems)
+                .WithOne(dei => dei.Product)     
+                .HasForeignKey(dei => dei.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<ProductsEntity>()
+                .HasMany(p => p.ComboProducts)
+                .WithOne(dei => dei.Product)
+                .HasForeignKey(dei => dei.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<PurchaseEntity>()
+                .HasMany(p => p.Items)
+                .WithOne(i => i.Purchase)
+                .HasForeignKey(i => i.PurchaseId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
     }

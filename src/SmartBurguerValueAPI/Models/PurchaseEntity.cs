@@ -11,6 +11,6 @@ namespace SmartBurguerValueAPI.Models
         public DateTime PurchaseDate { get; set; }
         public Guid EnterpriseId { get; set; }
         public EnterpriseEntity Enterprise { get; set; }
-        public ICollection<PurchaseItemEntity> Items { get; set; }
+        public ICollection<PurchaseItemEntity> Items { get; set; } = new List<PurchaseItemEntity>();
     }
 }

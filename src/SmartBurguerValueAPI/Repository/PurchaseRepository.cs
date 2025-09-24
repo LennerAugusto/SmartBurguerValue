@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using SmartBurguerValueAPI.Context;
 using SmartBurguerValueAPI.DTOs;
 using SmartBurguerValueAPI.DTOs.Products;
@@ -12,29 +13,26 @@ namespace SmartBurguerValueAPI.Repository
     public class PurchaseRepository : RepositoryBase<PurchaseEntity>, IPurchaseRepository
     {
         private readonly IUnityOfWork _UnityOfWork;
-        public PurchaseRepository(AppDbContext context, IUnityOfWork unityOfWork) : base(context)
+        private readonly IMapper _map;
+        public PurchaseRepository(AppDbContext context, IUnityOfWork unityOfWork, IMapper map) : base(context)
         {
             _UnityOfWork = unityOfWork;
+            _map = map;
         }
         public async Task<List<PurchaseDTO>> GetAllPurchasesByEnterpriseId(Guid enterpriseId)
         {
             var query = await _context.Purchase
                 .Where(x => x.EnterpriseId == enterpriseId)
                 .OrderBy(x => x.Id)
-                .Select(x => new PurchaseDTO
-                {
-                    Id = x.Id,
-                    SupplierName = x.SupplierName,
-                    PurchaseDate = x.PurchaseDate,
-                    TotalAmount = x.TotalAmount,
-                    PurchaseItems = x.Items.Select(i => new PurchaseItemDTO
-                    {
-                        NameItem = i.NameItem,
-                        Quantity = i.Quantity,
-                        UnitPrice = i.UnitPrice,
-                    }).ToList()
-                }).ToListAsync();
-            return query;
+                .ToListAsync();
+            return _map.Map<List<PurchaseDTO>>(query);
+        }
+        public async Task<PurchaseDTO> GetPurchaseById(Guid purchaseId)
+        {
+            var purchase = _context.Purchase
+                .Where(x => x.Id == purchaseId)
+                .Include(x => x.Items).FirstOrDefault();
+            return _map.Map<PurchaseDTO>(purchase);
         }
 
         public async Task<PurchaseEntity> CreatePurchase(PurchaseDTO dto)
@@ -54,16 +52,17 @@ namespace SmartBurguerValueAPI.Repository
                 DateCreated = dto.DateCreated != default ? dto.DateCreated : DateTime.UtcNow,
                 DateUpdated = DateTime.UtcNow,
                 EnterpriseId = dto.EnterpriseId,
-                Items = dto.PurchaseItems.Select(i => new PurchaseItemEntity
+                Items = dto.Items.Select(i => new PurchaseItemEntity
                 {
                     Id = Guid.NewGuid(),
-                    PurchaseId = purchaseId, 
+                    PurchaseId = purchaseId,
                     NameItem = i.NameItem,
                     Quantity = i.Quantity,
                     UnitPrice = i.UnitPrice,
                     IngredientId = i.IngredientId,
-                    UnityOfMensureId = i.UnityOfMeasureId,
-                    InventoryItemId = i.InventoryItemId
+                    UnityOfMensureId = i.UnityOfMensureId,
+                    InventoryItemId = i.InventoryItemId,
+                    IsActive = true,
                 }).ToList()
             };
 
@@ -75,23 +74,70 @@ namespace SmartBurguerValueAPI.Repository
             return entity;
         }
 
+        public async Task UpdatePurchaseAsync(PurchaseDTO dto)
+        {
+            var purchase = await _context.Purchase
+                .FirstOrDefaultAsync(p => p.Id == dto.Id);
+
+            if (purchase == null)
+                throw new Exception("Compra não encontrada.");
+
+            decimal total = 0;
+
+            var oldItems = await _context.PurchaseItem
+                .Where(pi => pi.PurchaseId == purchase.Id)
+                .ToListAsync();
+
+            _context.PurchaseItem.RemoveRange(oldItems);
+
+            foreach (var item in dto.Items)
+            {
+                var purchaseItem = new PurchaseItemEntity
+                {
+                    Id = Guid.NewGuid(),
+                    PurchaseId = purchase.Id,
+                    IngredientId = item.IngredientId,
+                    InventoryItemId = item.InventoryItemId,
+                    UnityOfMensureId = item.UnityOfMensureId,
+                    Quantity = item.Quantity,
+                    UnitPrice = item.UnitPrice,
+                    DateCreated = DateTime.UtcNow,
+                    DateUpdated = DateTime.UtcNow,
+                    NameItem = item.NameItem,
+                    IsActive = true
+                };
+
+                total += item.Quantity * item.UnitPrice;
+
+                await _context.PurchaseItem.AddAsync(purchaseItem);
+            }
+
+            purchase.SupplierName = dto.SupplierName;
+            purchase.PurchaseDate = dto.PurchaseDate;
+            purchase.IsActive = dto.IsActive;
+            purchase.TotalAmount = total;
+            purchase.DateUpdated = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+        }
+
         public async Task UpdateProductsAsync(Guid enterpriseId, PurchaseDTO purchase)
         {
             var products = await _UnityOfWork.ProductRepository.GetAllProductsByEnterpriseId(enterpriseId);
 
             foreach (var product in products)
-            { 
+            {
                 if (product.Ingredients == null || !product.Ingredients.Any())
                     continue;
 
                 var matchedIngredients = product.Ingredients
-                    .Where(ingredient => purchase.PurchaseItems
+                    .Where(ingredient => purchase.Items
                         .Any(purchaseItem => purchaseItem.IngredientId == ingredient.Id))
                     .ToList();
 
                 if (matchedIngredients != null)
                 {
-                  await _UnityOfWork.ProductRepository.UpdateProductAsync(product);
+                    await _UnityOfWork.ProductRepository.UpdateProductAsync(product);
                 }
             }
 
@@ -112,12 +158,12 @@ namespace SmartBurguerValueAPI.Repository
 
                     foreach (var ingredient in product.Ingredients)
                     {
-                        var purchaseItem = purchase.PurchaseItems
+                        var purchaseItem = purchase.Items
                             .Where(p => p.IngredientId == ingredient.Id);
 
                         if (purchaseItem != null)
                         {
-                           await _UnityOfWork.ComboRepository.UpdateComboAsync(combo);
+                            await _UnityOfWork.ComboRepository.UpdateComboAsync(combo);
                         }
                     }
                 }

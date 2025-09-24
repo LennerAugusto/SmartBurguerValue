@@ -209,9 +209,9 @@ builder.Services.AddAuthentication(options =>
 // =====================
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
-    options.AddPolicy("EnterpriseOnly", policy => policy.RequireRole("Enterprise"));
-    options.AddPolicy("EnterpriseEmployeeOnly", policy => policy.RequireRole("EnterpriseEmployee"));
+    options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("Enterprise", policy => policy.RequireRole("Enterprise"));
+    options.AddPolicy("EnterpriseEmployee", policy => policy.RequireRole("EnterpriseEmployee"));
 });
 
 // =====================
@@ -246,7 +246,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowBlazorFrontend", policy =>
     {
         policy
-            .WithOrigins("https://localhost:7056") // Porta do Blazor
+            .WithOrigins("https://localhost:7056", "https://localhost:7027") // Porta do Blazor
             .AllowAnyHeader()
             .AllowAnyMethod();
     });

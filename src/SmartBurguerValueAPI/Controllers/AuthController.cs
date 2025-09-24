@@ -7,6 +7,7 @@ using SmartBurguerValueAPI.Models;
 using SmartBurguerValueAPI.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography.X509Certificates;
 
 namespace SmartBurguerValueAPI.Controllers
 {
@@ -205,7 +206,7 @@ namespace SmartBurguerValueAPI.Controllers
 
         [HttpPost]
         [Route("AddUserToRole")]
-        [Authorize(Policy = "AdminOnly")]
+        [Authorize(Policy = "Admin")]
         public async Task<IActionResult> AddUserToRole(string email, string roleName)
         {
             var user = await _userManager.FindByEmailAsync(email);
@@ -235,6 +236,24 @@ namespace SmartBurguerValueAPI.Controllers
                 }
             }
             return BadRequest(new { error = "Unable to find user" });
+        }
+        [HttpGet]
+        [Route("users/by-enterprise-id")]
+        [Authorize(Policy = "Admin")]
+        public IActionResult GetAllUsers(Guid enterpriseId)
+        {
+            var users = _userManager.Users
+                        .Select(u => new
+                        {
+                            u.Id,
+                            u.UserName,
+                            u.Email,
+                            u.EnterpriseId
+                        })
+                        .Where(x => x.EnterpriseId == enterpriseId)
+                        .ToList();
+
+            return Ok(users);
         }
 
     }

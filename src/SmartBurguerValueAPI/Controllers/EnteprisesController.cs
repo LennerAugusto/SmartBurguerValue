@@ -1,15 +1,16 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 using SmartBurguerValueAPI.Context;
-using SmartBurguerValueAPI.DTOs.Products;
 using SmartBurguerValueAPI.DTOs;
+using SmartBurguerValueAPI.DTOs.Products;
 using SmartBurguerValueAPI.Interfaces;
-using SmartBurguerValueAPI.Models.Products;
 using SmartBurguerValueAPI.Models;
+using SmartBurguerValueAPI.Models.Products;
 
 namespace SmartBurguerValueAPI.Controllers
 {
-    //[Authorize(Policy = "Admin")]
+    [Authorize(Policy = "Admin")]
     [Microsoft.AspNetCore.Mvc.Route("api/enterprise")]
     public class EnteprisesController : ControllerBase
     {
@@ -31,7 +32,7 @@ namespace SmartBurguerValueAPI.Controllers
         [HttpGet("get-by-id/")]
         public async Task<IActionResult> GetEnterpriseById(Guid EnterpriseId)
         {
-            var Enterprise = _unityOfWork.EnterpriseRepository.GetByIdAsync(EnterpriseId);
+            var Enterprise = await _unityOfWork.EnterpriseRepository.GetByIdAsync(EnterpriseId);
             return Ok(Enterprise);
         }
 

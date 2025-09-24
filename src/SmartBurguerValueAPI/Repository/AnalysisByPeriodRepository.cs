@@ -67,16 +67,17 @@ namespace SmartBurguerValueAPI.Repository
                          && x.EnterpriseId == enterpriseId);
 
             var result = await query
-                .SelectMany(x => x.Items) 
-                .GroupBy(i => i.ProductId) 
+                .SelectMany(x => x.Items)
+                .GroupBy(i => i.ProductId)
                 .Select(g => new BestSellingProductsDTO
                 {
                     ProductId = g.Key,
-                    Name = g.FirstOrDefault().Product.Name, 
+                    Name = g.FirstOrDefault().Product.Name,
                     Quantity = g.Sum(i => i.Quantity),
                     SellingPrice = g.FirstOrDefault().SellingPrice,
                     ImageUrl = g.FirstOrDefault().Product.ImageUrl
                 })
+                .Where(x => x.ProductId != null)
                 .OrderByDescending(x => x.Quantity) 
                 .ToListAsync();
 

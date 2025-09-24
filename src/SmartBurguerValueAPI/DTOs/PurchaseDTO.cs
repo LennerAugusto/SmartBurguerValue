@@ -7,6 +7,6 @@
         public DateTime PurchaseDate { get; set; }
         public decimal TotalAmount { get; set; }
         public Guid EnterpriseId { get; set; }
-        public List<PurchaseItemDTO> PurchaseItems { get; set; }
+        public List<PurchaseItemDTO> Items { get; set; }
     }
 }

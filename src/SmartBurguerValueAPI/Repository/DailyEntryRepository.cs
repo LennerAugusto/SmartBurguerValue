@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using SmartBurguerValueAPI.Context;
 using SmartBurguerValueAPI.DTOs;
 using SmartBurguerValueAPI.Interfaces;
+using SmartBurguerValueAPI.Migrations;
 using SmartBurguerValueAPI.Models;
 using SmartBurguerValueAPI.Repository.Base;
 
@@ -16,7 +17,7 @@ namespace SmartBurguerValueAPI.Repository
         }
         public async Task<IQueryable<DailyEntryDTO>> GetAllDailyEntryByEnterpriseId(Guid enterpriseId)
         {
-            var dailyEntries =  _context.DailyEntry
+            var dailyEntries = _context.DailyEntry
                 .Where(x => x.EnterpriseId == enterpriseId)
                 .Include(i => i.Items)
                 .Select(x => new DailyEntryDTO
@@ -25,9 +26,10 @@ namespace SmartBurguerValueAPI.Repository
                     EntryDate = x.EntryDate,
                     Description = x.Description,
                     EnterpriseId = x.EnterpriseId,
-                    TotalItems = x.Items.Sum(i => i.Quantity),
-                    TotalCost = x.Items.Sum(i => i.TotalCPV),
-                    Revenue = x.Items.Sum(i => i.TotalRevenue),
+                    TotalOrders = x.TotalOrders,
+                    TotalItems = x.Items.Sum(i => i.Quantity) ?? 0,
+                    TotalCost = x.Items.Sum(i => i.TotalCPV) ?? 0,
+                    Revenue = x.Items.Sum(i => i.TotalRevenue) ?? 0,
                     Liquid = x.Items.Sum(i => i.TotalRevenue) - x.Items.Sum(i => i.TotalCPV),
                     Items = x.Items.Select(i => new DailyEntryItemDTO
                     {
@@ -53,12 +55,14 @@ namespace SmartBurguerValueAPI.Repository
                     EntryDate = x.EntryDate,
                     Description = x.Description,
                     EnterpriseId = x.EnterpriseId,
-                    TotalItems = x.Items.Sum(i => i.Quantity),
-                    TotalCost = x.Items.Sum(i => i.TotalCPV),
-                    Revenue = x.Items.Sum(i => i.TotalRevenue),
+                    TotalOrders = x.TotalOrders,
+                    TotalItems = x.Items.Sum(i => i.Quantity) ?? 0,
+                    TotalCost = x.Items.Sum(i => i.TotalCPV) ?? 0,
+                    Revenue = x.Items.Sum(i => i.TotalRevenue) ?? 0,
                     Liquid = x.Items.Sum(i => i.TotalRevenue) - x.Items.Sum(i => i.TotalCPV),
                     Items = x.Items.Select(i => new DailyEntryItemDTO
                     {
+                        DailyEntryId = i.DailyEntryId,
                         Id = i.Id,
                         Name = i.Name ?? i.Product.Name ?? "Sem nome",
                         Quantity = i.Quantity,
@@ -69,7 +73,7 @@ namespace SmartBurguerValueAPI.Repository
 
             return dailyEntrie;
         }
-        public async Task<DailyEntryDTO> UpdateDailyEntryAsync(DailyEntryDTO dto)
+        public async Task UpdateDailyEntryAsync(DailyEntryDTO dto)
         {
             var entry = await _context.DailyEntry
                 .Include(e => e.Items)
@@ -82,41 +86,27 @@ namespace SmartBurguerValueAPI.Repository
             entry.Description = dto.Description;
             entry.DateUpdated = DateTime.UtcNow;
 
+            entry.TotalOrders = dto.TotalOrders;
+
             _context.DailyEntryItem.RemoveRange(entry.Items);
-            await _context.SaveChangesAsync(); 
 
             var newItems = dto.Items.Select(i => new DailyEntryItemEntity
             {
                 DailyEntryId = entry.Id,
+                ProductId = i.ProductId,
+                ComboId = i.ComboId,
                 Name = i.Name,
                 Quantity = i.Quantity,
                 TotalCPV = i.TotalCPV,
-                TotalRevenue = i.TotalRevenue
+                TotalRevenue = i.TotalRevenue,
+                DateCreated = DateTime.UtcNow,
+                DateUpdated = DateTime.UtcNow,
+                IsActive = true
             }).ToList();
 
             _context.DailyEntryItem.AddRange(newItems);
+
             await _context.SaveChangesAsync();
-
-            return new DailyEntryDTO
-            {
-                Id = entry.Id,
-                EntryDate = entry.EntryDate,
-                Description = entry.Description,
-                EnterpriseId = entry.EnterpriseId,
-                TotalItems = newItems.Sum(i => i.Quantity),
-                TotalCost = newItems.Sum(i => i.TotalCPV),
-                Revenue = newItems.Sum(i => i.TotalRevenue),
-                Liquid = newItems.Sum(i => i.TotalRevenue) - newItems.Sum(i => i.TotalCPV),
-                Items = newItems.Select(i => new DailyEntryItemDTO
-                {
-                    Id = i.Id,
-                    Name = i.Name,
-                    Quantity = i.Quantity,
-                    TotalCPV = i.TotalCPV,
-                    TotalRevenue = i.TotalRevenue
-                }).ToList()
-            };
-
         }
 
 

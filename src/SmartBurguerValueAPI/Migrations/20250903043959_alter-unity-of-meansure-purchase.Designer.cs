@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SmartBurguerValueAPI.Context;
 
@@ -11,9 +12,11 @@ using SmartBurguerValueAPI.Context;
 namespace SmartBurguerValueAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class SmartBurguerValueAPIContextModelSnapshot : ModelSnapshot
+    [Migration("20250903043959_alter-unity-of-meansure-purchase")]
+    partial class alterunityofmeansurepurchase
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -250,9 +253,6 @@ namespace SmartBurguerValueAPI.Migrations
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)");
-
-                    b.Property<int?>("TotalOrders")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -493,24 +493,15 @@ namespace SmartBurguerValueAPI.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
 
-                    b.Property<DateTime>("DueDate")
-                        .HasColumnType("datetime(6)");
-
                     b.Property<Guid>("EnterpriseId")
                         .HasColumnType("char(36)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<bool>("IsPaid")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
-
-                    b.Property<DateTime>("PaymentDate")
-                        .HasColumnType("datetime(6)");
 
                     b.Property<decimal>("Value")
                         .HasColumnType("decimal(10,2)");
@@ -933,7 +924,7 @@ namespace SmartBurguerValueAPI.Migrations
                     b.Property<decimal>("UnitPrice")
                         .HasColumnType("decimal(10,2)");
 
-                    b.Property<Guid>("UnityOfMensureId")
+                    b.Property<Guid?>("UnityOfMensureId")
                         .HasColumnType("char(36)");
 
                     b.HasKey("Id");
@@ -1236,9 +1227,7 @@ namespace SmartBurguerValueAPI.Migrations
 
                     b.HasOne("SmartBurguerValueAPI.Models.Products.UnityTypesProductsEntity", "UnityOfMensure")
                         .WithMany()
-                        .HasForeignKey("UnityOfMensureId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UnityOfMensureId");
 
                     b.Navigation("InventoryItem");
 

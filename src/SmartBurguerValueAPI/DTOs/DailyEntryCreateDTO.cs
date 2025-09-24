@@ -9,6 +9,7 @@ namespace SmartBurguerValueAPI.DTOs
         public string? Description { get; set; }
         public Guid EnterpriseId { get; set; }
         public bool IsActive { get; set; } = true;
+        public int? TotalOrders { get; set; }
         public DateTime? DateCreated { get; set; } = DateTime.UtcNow;
         public DateTime? DateUpdated { get; set; } = DateTime.UtcNow;
 

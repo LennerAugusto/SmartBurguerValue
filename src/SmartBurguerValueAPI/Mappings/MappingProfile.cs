@@ -16,6 +16,9 @@ namespace SmartBurguerValueAPI.Mappings
             CreateMap<EmployeeDTO, EmployeeEntity>().ReverseMap();
             CreateMap<WorkScheduleDTO, EmployeeWorkScheduleEntity>().ReverseMap();
             CreateMap<DailyEntryDTO, DailyEntryItemEntity>().ReverseMap();
+            CreateMap<PurchaseItemDTO, PurchaseItemEntity>().ReverseMap();
+            CreateMap<PurchaseDTO, PurchaseEntity>().ReverseMap();
+            CreateMap<FixedCoastDTO, FixedCostEntity>().ReverseMap();
         }
     }
 }

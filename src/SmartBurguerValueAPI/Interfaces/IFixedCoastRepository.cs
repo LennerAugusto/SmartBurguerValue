@@ -7,6 +7,6 @@ namespace SmartBurguerValueAPI.Interfaces
 {
     public interface IFixedCoastRepository : IRepositoryBase<FixedCostEntity>
     {
-        Task<PagedList<FixedCoastDTO>> GetAllFixedCostByEnterpriseId(PaginationParamiters paramiters, Guid EnterpriseId);
+        Task<List<FixedCoastDTO>> GetAllFixedCostByEnterpriseId(Guid EnterpriseId);
     }
 }
