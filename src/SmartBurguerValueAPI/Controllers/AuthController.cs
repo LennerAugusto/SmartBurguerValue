@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using SmartBurguerValueAPI.DTOs;
 using SmartBurguerValueAPI.DTOs.IdentityDTOs;
 using SmartBurguerValueAPI.Models;
 using SmartBurguerValueAPI.Services;
@@ -81,7 +83,7 @@ namespace SmartBurguerValueAPI.Controllers
 
         [HttpPost]
         [Route("register")]
-        [Authorize(Policy = "AdminOnly")]
+        [Authorize(Policy = "Admin")]
         public async Task<IActionResult> Register([FromBody] RegisterModelDTO model)
         {
             var user = await _userManager.FindByNameAsync(model.UserName);
@@ -96,6 +98,7 @@ namespace SmartBurguerValueAPI.Controllers
                 Email = model.Email,
                 SecurityStamp = Guid.NewGuid().ToString(),
                 UserName = model.UserName,
+                PhoneNumber = model.PhoneNumber,
                 EnterpriseId = model.EnterpriseId,
             };
 
@@ -110,7 +113,7 @@ namespace SmartBurguerValueAPI.Controllers
 
         [HttpPost]
         [Route("refresh-token")]
-        [Authorize(Policy = "AdminOnly")]
+        [Authorize(Policy = "Admin")]
         public async Task<IActionResult> RefreshToken([FromBody] TokenModelDTO model)
         {
             if (model is null)
@@ -168,7 +171,7 @@ namespace SmartBurguerValueAPI.Controllers
 
         [HttpPost]
         [Route("CreateRole")]
-        [Authorize(Policy = "AdminOnly")]
+        [Authorize(Policy = "Admin")]
         public async Task<IActionResult> CreateRole(string roleName)
         {
             var roleExist = await _roleManager.RoleExistsAsync(roleName);
@@ -255,6 +258,89 @@ namespace SmartBurguerValueAPI.Controllers
 
             return Ok(users);
         }
+        [HttpGet]
+        [Route("users/get-all-admins")]
+        [Authorize(Policy = "Admin")]
+        public async Task<IActionResult> GetAllAdmins()
+        {
+            var admins = await _userManager.GetUsersInRoleAsync("Admin");
+
+            var result = admins.Select(u => new
+            {
+                u.Id,
+                u.UserName,
+                u.Email,
+                u.PhoneNumber,
+            }).ToList();
+
+            return Ok(result);
+        }
+        [HttpGet]
+        [Route("users/get-by-id")]
+        [Authorize(Policy = "Admin")]
+        public async Task<IActionResult> GetUserById(string Id)
+        {
+            var user = await _userManager.Users
+                        .Select(u => new
+                        {
+                            u.Id,
+                            u.UserName,
+                            u.Email,
+                            u.EnterpriseId
+                        })
+                        .Where(x => x.Id == Id)
+                        .FirstOrDefaultAsync();
+
+            return Ok(user);
+        }
+
+        [HttpPut]
+        [Route("users/update")]
+        [Authorize(Policy = "Admin")]
+        public async Task<IActionResult> UpdateUser([FromBody] UserDTO dto)
+        {
+            var NewId = dto.Id.ToString();
+            var user = await _userManager.FindByIdAsync(NewId);
+            if (user == null)
+                return NotFound("Usuário não encontrado.");
+
+            user.UserName = dto.UserName;
+            user.Email = dto.Email;
+            user.PhoneNumber = dto.PhoneNumber;
+            user.EnterpriseId = dto.EnterpriseId; 
+
+            var result = await _userManager.UpdateAsync(user);
+
+            if (!result.Succeeded)
+                return BadRequest(result.Errors);
+
+            return Ok(new
+            {
+                user.Id,
+                user.UserName,
+                user.Email,
+                user.PhoneNumber,
+                user.EnterpriseId
+            });
+        }
+        [HttpDelete]
+        [Route("users/delete{id}")]
+        [Authorize(Policy = "Admin")]
+        public async Task<IActionResult> DeleteUser(Guid id)
+        {
+            var NewId = id.ToString();
+            var user = await _userManager.FindByIdAsync(NewId);
+            if (user == null)
+                return NotFound("Usuário não encontrado.");
+
+            var result = await _userManager.DeleteAsync(user);
+
+            if (!result.Succeeded)
+                return BadRequest(result.Errors);
+
+            return Ok(new { message = "Usuário deletado com sucesso." });
+        }
+
 
     }
 }

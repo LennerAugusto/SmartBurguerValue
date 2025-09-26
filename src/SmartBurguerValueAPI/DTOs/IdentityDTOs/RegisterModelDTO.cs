@@ -12,6 +12,7 @@ namespace SmartBurguerValueAPI.DTOs.IdentityDTOs
         [EmailAddress]
         [Required(ErrorMessage = "Email is requeired")]
         public string? Email { get; set; }
-        public Guid EnterpriseId { get; set; }
+        public string? PhoneNumber { get; set; }
+        public Guid? EnterpriseId { get; set; }
     }
 }
