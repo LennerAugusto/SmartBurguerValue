@@ -7,6 +7,5 @@
         LastSemester,
         LastFourWeeks,
         LastWeek
-
     }
 }

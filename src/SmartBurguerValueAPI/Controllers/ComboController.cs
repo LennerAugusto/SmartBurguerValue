@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SmartBurguerValueAPI.Controllers
 {
-    //[Authorize(Policy = "Enterprise")]
+    [Authorize(Policy = "Enterprise")]
     [Microsoft.AspNetCore.Mvc.Route("api/combo")]
     public class ComboController : ControllerBase
     {

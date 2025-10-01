@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SmartBurguerValueAPI.Constants;
 using SmartBurguerValueAPI.Context;
 using SmartBurguerValueAPI.DTOs.Analysis;
@@ -30,6 +31,12 @@ namespace SmartBurguerValueAPI.Controllers
         public async Task<ActionResult<IEnumerable<BestSellingProductsDTO>>> GetBestSellingProducts([FromBody] AnalysisRequestDTO analysis)
         {
             var Products = await _unityOfWork.AnalysisByPeriodRepository.GetBestSellingProductsByEnterpriseId(analysis.Period, analysis.EnterpriseId);
+            return Ok(Products);
+        }
+        [HttpPost("invoicing/by-enterprise-id")]
+        public async Task<ActionResult<IEnumerable<InvoicingSeriesDTO>>> GetInvoicing([FromBody] AnalysisRequestDTO analysis)
+        {
+            var Products = await _unityOfWork.AnalysisByPeriodRepository.GetInvoicingByPeriod(analysis.Period, analysis.EnterpriseId);
             return Ok(Products);
         }
     }
