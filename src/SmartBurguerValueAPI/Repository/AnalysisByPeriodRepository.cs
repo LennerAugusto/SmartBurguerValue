@@ -65,20 +65,20 @@ namespace SmartBurguerValueAPI.Repository
                 .SelectMany(x => x.Items.DefaultIfEmpty())
                 .SumAsync(i => i != null ? i.TotalRevenue : 0);
 
-            var totalExpanses = await query
-                .SelectMany(x => x.Items.DefaultIfEmpty())
-                .SumAsync(i => i != null ? i.TotalCPV : 0);
-            var totalOrders = await query.CountAsync();
+            //var totalExpansesEmployee = await _context.Employees
+            //    .SumAsync(i => i != null ? i.MonthlySalary : 0);
 
+            var totalOrders = await query.CountAsync();
+            var averageTicket = totalOrders > 0 ? totalSales / totalOrders : 0;
             return new InitialAnalysiDTO
             {
                 TotalSales = totalSales,
                 TotalOrders = totalOrders,
-                TotalExpanses = totalExpanses,
+                AverageTicket = Math.Round((decimal)averageTicket, 2),
             };
         }
 
-        public async Task<List<BestSellingProductsDTO>> GetBestSellingProductsByEnterpriseId(EPeriod period, Guid enterpriseId)
+        public async Task<List<BestSellingProductsDTO>> GetCardsBestSellingProductsByEnterpriseId(EPeriod period, Guid enterpriseId)
         {
             DateTime startDate = SelectPeriod(period);
             DateTime endDate = DateTime.UtcNow;
@@ -111,7 +111,7 @@ namespace SmartBurguerValueAPI.Repository
         {
             var range = GetPeriod(period);
             DateTime start = range.Start;
-            DateTime end = range.End;
+            DateTime end = range.End.Date.AddDays(1).AddTicks(-1);
 
             string granularity = period switch
             {
@@ -172,6 +172,414 @@ namespace SmartBurguerValueAPI.Repository
             }
             return series;
         }
+        public async Task<List<TotalOrdersDTO>> GetTotalOrdersByPeriod(EPeriod period, Guid enterpriseId)
+        {
+            var range = GetPeriod(period);
+            DateTime start = range.Start;
+            DateTime end = range.End.Date.AddDays(1).AddTicks(-1);
 
+            string granularity = period switch
+            {
+                EPeriod.LastWeek => "day",
+                EPeriod.LastFourWeeks => "day",
+                EPeriod.LastSemester => "month",
+                EPeriod.LastYear => "month",
+                EPeriod.SinceTheBeginning => "total",
+                _ => "total"
+            };
+
+            var query = _context.DailyEntry
+                .Include(x => x.Items)
+                .Where(x => x.EntryDate >= start && x.EntryDate <= end && x.EnterpriseId == enterpriseId);
+
+            List<TotalOrdersDTO> series = new();
+
+            if (granularity == "day")
+            {
+                var dailyTotals = await query
+                    .GroupBy(x => x.EntryDate.Date)
+                    .Select(g => new { Date = g.Key, Orders = g.Sum(i => i.TotalOrders) })
+                    .ToListAsync();
+
+                for (var date = start.Date; date <= end.Date; date = date.AddDays(1))
+                {
+                    var total = dailyTotals.FirstOrDefault(x => x.Date == date)?.Orders ?? 0;
+                    series.Add(new TotalOrdersDTO
+                    {
+                        Label = date.ToString("dd/MM"),
+                        Orders = total
+                    });
+                }
+            }
+            else if (granularity == "month")
+            {
+                var monthlyTotals = await query
+                    .GroupBy(x => new { x.EntryDate.Year, x.EntryDate.Month })
+                    .Select(g => new
+                    {
+                        g.Key.Year,
+                        g.Key.Month,
+                        Orders = g.Sum(i => i.TotalOrders)
+                    })
+                    .ToListAsync();
+
+                for (var date = new DateTime(start.Year, start.Month, 1); date <= end; date = date.AddMonths(1))
+                {
+                    var total = monthlyTotals
+                        .FirstOrDefault(x => x.Year == date.Year && x.Month == date.Month)?.Orders ?? 0;
+
+                    series.Add(new TotalOrdersDTO
+                    {
+                        Label = date.ToString("MMM"),
+                        Orders = total
+                    });
+                }
+            }
+            else
+            {
+                var totalOrders = await query.SumAsync(i => i.TotalOrders);
+                series.Add(new TotalOrdersDTO
+                {
+                    Label = "Total",
+                    Orders = totalOrders
+                });
+            }
+
+            return series;
+        }
+        public async Task<GetAnalysisCardsProductsDTO> GetMarginAndProfitProductByPeriod(EPeriod Period, Guid enterpriseId)
+        {
+
+            DateTime startDate = SelectPeriod(Period);
+            DateTime endDate = DateTime.UtcNow;
+
+            var query = _context.DailyEntry
+                .Include(x => x.Items)
+                .Where(x => x.EntryDate >= startDate && x.EntryDate <= endDate 
+                      && x.EnterpriseId == enterpriseId);
+
+            var totalRevenue = await query
+                .SelectMany(x => x.Items.Where(i => i.ComboId == null))
+                .SumAsync(i => (decimal?)i.TotalRevenue ?? 0);
+            var totalProfit = await query
+                .SelectMany(x => x.Items.Where(i => i.ComboId == null))
+                .SumAsync(i => (decimal?)(i.TotalRevenue - i.TotalCPV) ?? 0);
+
+            var profitMargin = totalRevenue > 0 ? (totalProfit / totalRevenue) * 100 : 0;
+            return new GetAnalysisCardsProductsDTO
+            {
+                Profit = Math.Round(totalProfit, 2),
+                Margin = Math.Round(profitMargin, 2)
+            };
+        }
+        public async Task<GetAnalysisCardsProductsDTO> GetMarginAndProfitComboByPeriod(EPeriod Period, Guid enterpriseId)
+        {
+
+            DateTime startDate = SelectPeriod(Period);
+            DateTime endDate = DateTime.UtcNow;
+            var query = _context.DailyEntry
+                .Include(x => x.Items)
+                .Where(x => x.EntryDate >= startDate && x.EntryDate <= endDate
+                      && x.EnterpriseId == enterpriseId);
+
+            var totalRevenue = await query
+                .SelectMany(x => x.Items.Where(i => i.ComboId != null))
+                .SumAsync(i => (decimal?)i.TotalRevenue ?? 0);
+            var totalProfit = await query
+                .SelectMany(x => x.Items.Where(i => i.ComboId != null))
+                .SumAsync(i => (decimal?)(i.TotalRevenue - i.TotalCPV) ?? 0);
+            var profitMargin = totalRevenue > 0 ? (totalProfit / totalRevenue) * 100 : 0;
+            return new GetAnalysisCardsProductsDTO
+            {
+                Profit = Math.Round(totalProfit, 2),
+                Margin = Math.Round(profitMargin, 2)
+            };
+        }
+        public async Task<List<BestSellingProductsByPeriodDTO>> GetBestSellingCombosByPeriod(EPeriod period, Guid enterpriseId)
+        {
+            var range = GetPeriod(period);
+            DateTime start = range.Start;
+            DateTime end = range.End.Date.AddDays(1).AddTicks(-1);
+
+            string granularity = period switch
+            {
+                EPeriod.LastWeek => "day",
+                EPeriod.LastFourWeeks => "day",
+                EPeriod.LastSemester => "month",
+                EPeriod.LastYear => "month",
+                EPeriod.SinceTheBeginning => "total",
+                _ => "total"
+            };
+
+            var baseQuery = _context.DailyEntry
+                .Where(d => d.EntryDate >= start && d.EntryDate <= end && d.EnterpriseId == enterpriseId);
+
+            var result = new List<BestSellingProductsByPeriodDTO>();
+
+            if (granularity == "day")
+            {
+                var dailyCombos = await baseQuery
+                    .SelectMany(d => d.Items
+                        .Where(i => i.ComboId != null) 
+                        .Select(i => new
+                        {
+                            Date = d.EntryDate.Date,
+                            ComboId = i.ComboId,
+                            ComboName = i.Combo != null ? i.Combo.Name : null,
+                            Quantity = i.Quantity 
+                        }))
+                    .GroupBy(x => new { x.Date, x.ComboId, x.ComboName })
+                    .Select(g => new
+                    {
+                        g.Key.Date,
+                        g.Key.ComboId,
+                        g.Key.ComboName,
+                        Quantity = g.Sum(x => (int?)x.Quantity) ?? 0
+                    })
+                    .ToListAsync();
+
+                for (var date = start.Date; date <= end.Date; date = date.AddDays(1))
+                {
+                    var top = dailyCombos
+                        .Where(x => x.Date == date)
+                        .OrderByDescending(x => x.Quantity)
+                        .FirstOrDefault();
+
+                    result.Add(new BestSellingProductsByPeriodDTO
+                    {
+                        Label = date.ToString("dd/MM"),
+                        NameProduct = top?.ComboName ?? "",
+                        Quantity = top?.Quantity ?? 0
+                    });
+                }
+            }
+            else if (granularity == "month")
+            {
+                var monthlyCombos = await baseQuery
+                    .SelectMany(d => d.Items
+                        .Where(i => i.ComboId != null)
+                        .Select(i => new
+                        {
+                            Year = d.EntryDate.Year,
+                            Month = d.EntryDate.Month,
+                            ComboId = i.ComboId,
+                            ComboName = i.Combo != null ? i.Combo.Name : null,
+                            Quantity = i.Quantity
+                        }))
+                    .GroupBy(x => new { x.Year, x.Month, x.ComboId, x.ComboName })
+                    .Select(g => new
+                    {
+                        g.Key.Year,
+                        g.Key.Month,
+                        g.Key.ComboId,
+                        g.Key.ComboName,
+                        Quantity = g.Sum(x => (int?)x.Quantity) ?? 0
+                    })
+                    .ToListAsync();
+
+                for (var date = new DateTime(start.Year, start.Month, 1); date <= end; date = date.AddMonths(1))
+                {
+                    var top = monthlyCombos
+                        .Where(x => x.Year == date.Year && x.Month == date.Month)
+                        .OrderByDescending(x => x.Quantity)
+                        .FirstOrDefault();
+
+                    result.Add(new BestSellingProductsByPeriodDTO
+                    {
+                        Label = date.ToString("MMM"),
+                       NameProduct = top?.ComboName ?? "",
+                        Quantity = top?.Quantity ?? 0
+                    });
+                }
+            }
+            else 
+            {
+                var totalCombo = await baseQuery
+                    .SelectMany(d => d.Items
+                        .Where(i => i.ComboId != null)
+                        .Select(i => new
+                        {
+                            ComboId = i.ComboId,
+                            ComboName = i.Combo != null ? i.Combo.Name : null,
+                            Quantity = i.Quantity
+                        }))
+                    .GroupBy(x => new { x.ComboId, x.ComboName })
+                    .Select(g => new
+                    {
+                        g.Key.ComboId,
+                        g.Key.ComboName,
+                        Quantity = g.Sum(x => (int?)x.Quantity) ?? 0
+                    })
+                    .OrderByDescending(x => x.Quantity)
+                    .FirstOrDefaultAsync();
+
+                result.Add(new BestSellingProductsByPeriodDTO
+                {
+                    Label = "Total",
+                    NameProduct = totalCombo?.ComboName ?? "",
+                    Quantity = totalCombo?.Quantity ?? 0
+                });
+            }
+
+            return result;
+        }
+        public async Task<List<BestSellingProductsByPeriodDTO>> GetBestSellingProductsByPeriod(EPeriod period, Guid enterpriseId)
+        {
+            var range = GetPeriod(period);
+            DateTime start = range.Start;
+            DateTime end = range.End.Date.AddDays(1).AddTicks(-1);
+
+            string granularity = period switch
+            {
+                EPeriod.LastWeek => "day",
+                EPeriod.LastFourWeeks => "day",
+                EPeriod.LastSemester => "month",
+                EPeriod.LastYear => "month",
+                EPeriod.SinceTheBeginning => "total",
+                _ => "total"
+            };
+
+            var baseQuery = _context.DailyEntry
+                .Where(d => d.EntryDate >= start && d.EntryDate <= end && d.EnterpriseId == enterpriseId);
+
+            var result = new List<BestSellingProductsByPeriodDTO>();
+
+            if (granularity == "day")
+            {
+                var dailyCombos = await baseQuery
+                    .SelectMany(d => d.Items
+                        .Where(i => i.ComboId == null)
+                        .Select(i => new
+                        {
+                            Date = d.EntryDate.Date,
+                            ProductId = i.ProductId,
+                            ProductName = i.Product != null ? i.Product.Name : null,
+                            Quantity = i.Quantity
+                        }))
+                    .GroupBy(x => new { x.Date, x.ProductId, x.ProductName })
+                    .Select(g => new
+                    {
+                        g.Key.Date,
+                        g.Key.ProductId,
+                        g.Key.ProductName,
+                        Quantity = g.Sum(x => (int?)x.Quantity) ?? 0
+                    })
+                    .ToListAsync();
+
+                for (var date = start.Date; date <= end.Date; date = date.AddDays(1))
+                {
+                    var top = dailyCombos
+                        .Where(x => x.Date == date)
+                        .OrderByDescending(x => x.Quantity)
+                        .FirstOrDefault();
+
+                    result.Add(new BestSellingProductsByPeriodDTO
+                    {
+                        Label = date.ToString("dd/MM"),
+                        NameProduct = top?.ProductName ?? "",
+                        Quantity = top?.Quantity ?? 0
+                    });
+                }
+            }
+            else if (granularity == "month")
+            {
+                var monthlyCombos = await baseQuery
+                    .SelectMany(d => d.Items
+                        .Where(i => i.ComboId == null)
+                        .Select(i => new
+                        {
+                            Year = d.EntryDate.Year,
+                            Month = d.EntryDate.Month,
+                            ProductId = i.ProductId,
+                            ProductName = i.Product != null ? i.Product.Name : null,
+                            Quantity = i.Quantity
+                        }))
+                    .GroupBy(x => new { x.Year, x.Month, x.ProductId, x.ProductName })
+                    .Select(g => new
+                    {
+                        g.Key.Year,
+                        g.Key.Month,
+                        g.Key.ProductId,
+                        g.Key.ProductName,
+                        Quantity = g.Sum(x => (int?)x.Quantity) ?? 0
+                    })
+                    .ToListAsync();
+
+                for (var date = new DateTime(start.Year, start.Month, 1); date <= end; date = date.AddMonths(1))
+                {
+                    var top = monthlyCombos
+                        .Where(x => x.Year == date.Year && x.Month == date.Month)
+                        .OrderByDescending(x => x.Quantity)
+                        .FirstOrDefault();
+
+                    result.Add(new BestSellingProductsByPeriodDTO
+                    {
+                        Label = date.ToString("MMM"),
+                        NameProduct = top?.ProductName ?? "",
+                        Quantity = top?.Quantity ?? 0
+                    });
+                }
+            }
+            else
+            {
+                var totalCombo = await baseQuery
+                    .SelectMany(d => d.Items
+                        .Where(i => i.ComboId == null)
+                        .Select(i => new
+                        {
+                            ProductId = i.ProductId,
+                            ProductName = i.Product != null ? i.Product.Name : null,
+                            Quantity = i.Quantity
+                        }))
+                    .GroupBy(x => new { x.ProductId, x.ProductName })
+                    .Select(g => new
+                    {
+                        g.Key.ProductId,
+                        g.Key.ProductName,
+                        Quantity = g.Sum(x => (int?)x.Quantity) ?? 0
+                    })
+                    .OrderByDescending(x => x.Quantity)
+                    .FirstOrDefaultAsync();
+
+                result.Add(new BestSellingProductsByPeriodDTO
+                {
+                    Label = "Total",
+                    NameProduct = totalCombo?.ProductName ?? "",
+                    Quantity = totalCombo?.Quantity ?? 0
+                });
+            }
+
+            return result;
+        }
+        public async Task<List<ProductsBestMarginDTO>> GetProductsBestMargin(Guid enterpriseId)
+        {
+            var query = await _context.Products
+                .Where(d => d.EnterpriseId == enterpriseId)
+                .OrderByDescending(d => d.Margin)
+                .Take(5)
+                .Select(d => new ProductsBestMarginDTO
+                {
+                    Name = d.Name,
+                    Margin = d.Margin
+                })
+                .ToListAsync();
+
+            return query;
+        }
+        public async Task<List<ProductsBestMarginDTO>> GetCombosBestMargin(Guid enterpriseId)
+        {
+            var query = await _context.Combos
+                .Where(d => d.EnterpriseId == enterpriseId)
+                .OrderByDescending(d => d.Margin)
+                .Take(5)
+                .Select(d => new ProductsBestMarginDTO
+                {
+                    Name = d.Name,
+                    Margin = d.Margin
+                })
+                .ToListAsync();
+
+            return query;
+        }
     }
 }

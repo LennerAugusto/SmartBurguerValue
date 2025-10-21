@@ -41,6 +41,10 @@ namespace SmartBurguerValueAPI.Controllers
         public async Task<ActionResult<DailyEntryCreateDTO>> CreateWithItemsAsync([FromBody] DailyEntryCreateDTO dto)
         {
             dto.Id = Guid.NewGuid();
+            foreach (var item in dto.Items)
+            {
+                Console.WriteLine($"Item: {item.Id}, Produto: {item.ProductId}, ComboId: {item.ComboId}");
+            }
             var entity = new DailyEntryEntity
             {
                 Id = dto.Id,

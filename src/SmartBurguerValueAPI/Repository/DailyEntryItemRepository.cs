@@ -16,15 +16,16 @@ namespace SmartBurguerValueAPI.Repository
         {
             decimal? sellingPrice, cpv;
 
-            if (item.ProductId != Guid.Empty)
+            if (item.ProductId != null && item.ComboId == null)
             {
                 var product = await _context.Products.FindAsync(item.ProductId);
-                    if (product == null) return null;
+                if (product == null) return null;
                 return new DailyEntryItemEntity
                 {
                     Id = Guid.NewGuid(),
                     DailyEntryId = dailyEntryId,
                     ProductId = item.ProductId,
+                    ComboId = item.ComboId,
                     Quantity = item.Quantity,
                     SellingPrice = product.SellingPrice,
                     TotalRevenue = product.SellingPrice * item.Quantity,
@@ -32,7 +33,7 @@ namespace SmartBurguerValueAPI.Repository
                 };
             }
 
-            if (item.ComboId != Guid.Empty)
+            if (item.ComboId != null && item.ProductId == null)
             {
                 var combo = await _context.Combos.FindAsync(item.ComboId);
 
@@ -42,6 +43,7 @@ namespace SmartBurguerValueAPI.Repository
                     DailyEntryId = dailyEntryId,
                     ComboId = item.ComboId,
                     Quantity = item.Quantity,
+                    SellingPrice = combo.SellingPrice,
                     TotalRevenue = combo.SellingPrice * item.Quantity,
                     TotalCPV = combo.CPV * item.Quantity
                 };
