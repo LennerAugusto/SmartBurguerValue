@@ -10,7 +10,7 @@ namespace SmartBurguerValueAPI.Models
         public DailyEntryEntity DailyEntry { get; set; }
         public Guid? ProductId { get; set; }
         [JsonIgnore]
-        public ProductsEntity? Product { get; set; }
+        public ProductsEntity Product { get; set; }
         public Guid? ComboId { get; set; }
         [JsonIgnore]
         public ComboEntity? Combo { get; set; }

@@ -24,6 +24,7 @@ namespace SmartBurguerValueAPI.Models.Products
         public decimal? Markup { get; set; }
         [Column(TypeName = "decimal(10,2)")]
         public decimal? Margin { get; set; }
+        public string? ProductType { get; set; }
         public Guid EnterpriseId { get; set; }
         public EnterpriseEntity Enterprise { get; set; }
         [JsonIgnore]

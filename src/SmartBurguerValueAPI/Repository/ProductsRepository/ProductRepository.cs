@@ -42,8 +42,11 @@ namespace SmartBurguerValueAPI.Repository.ProductsRepository
                     Markup = x.Markup,
                     Margin = x.Margin,
                     ImageUrl = x.ImageUrl,
+                    ProductType = x.ProductType,
                     EnterpriseId = enterpriseId,
-                    Ingredients = x.ProductIngredients.Select(i => new ProductIngredientDTO
+                    IsActive = x.IsActive,
+                    Ingredients = x.ProductIngredients
+                    .Select(i => new ProductIngredientDTO
                     {
                         Id = i.IngredientId,
                         Name = i.Name,
@@ -67,9 +70,10 @@ namespace SmartBurguerValueAPI.Repository.ProductsRepository
                 DesiredMargin = dto.DesiredMargin,
                 SellingPrice = dto.SellingPrice,
                 SuggestedPrice = dto.SuggestedPrice,
+                ProductType = dto.ProductType,
                 DateCreated = DateTime.UtcNow,
                 DateUpdated = DateTime.UtcNow,
-                IsActive = true
+                IsActive = dto.IsActive
             };
 
             decimal totalCost = 0;
@@ -160,13 +164,14 @@ namespace SmartBurguerValueAPI.Repository.ProductsRepository
                 throw new Exception("Product not found");
 
             product.Name = dto.Name;
+            product.ProductType = dto.ProductType;
             product.Description = dto.Description;
             product.ImageUrl = dto.ImageUrl;
             product.SellingPrice = dto.SellingPrice ?? product.SellingPrice;
             product.DesiredMargin = dto.DesiredMargin ?? product.DesiredMargin;
             product.SuggestedPrice = dto.SuggestedPrice ?? product.SuggestedPrice;
             product.DateUpdated = DateTime.UtcNow;
-
+            product.IsActive = dto.IsActive;
             await _UnityOfWork.ProductsIngredientRepository.RemoveAllByProductIdAsync(product.Id);
 
             decimal totalCost = 0;
@@ -268,12 +273,14 @@ namespace SmartBurguerValueAPI.Repository.ProductsRepository
                 DesiredMargin = productEntity.DesiredMargin,
                 SellingPrice = productEntity.SellingPrice,
                 SuggestedPrice = productEntity.SuggestedPrice,
+                ProductType = productEntity.ProductType,
                 CPV  = productEntity.CPV,
                 CMV = productEntity.CMV,
                 Margin =productEntity.Margin,
                 Markup = productEntity.Markup,
                 DateCreated = DateTime.UtcNow,
                 DateUpdate = DateTime.UtcNow,
+                IsActive = productEntity.IsActive,
                 Ingredients = productEntity.ProductIngredients.Select(i => new ProductIngredientDTO
                 {
                     Id = i.IngredientId,

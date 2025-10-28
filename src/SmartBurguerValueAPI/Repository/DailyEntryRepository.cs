@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartBurguerValueAPI.Context;
+using SmartBurguerValueAPI.Controllers;
 using SmartBurguerValueAPI.DTOs;
 using SmartBurguerValueAPI.Interfaces;
 using SmartBurguerValueAPI.Migrations;
@@ -19,6 +20,7 @@ namespace SmartBurguerValueAPI.Repository
         {
             var dailyEntries = _context.DailyEntry
                 .Where(x => x.EnterpriseId == enterpriseId)
+                .OrderByDescending(x => x.EntryDate)
                 .Include(i => i.Items)
                 .Select(x => new DailyEntryDTO
                 {
@@ -49,6 +51,7 @@ namespace SmartBurguerValueAPI.Repository
                 .Where(x => x.Id == Id)
                 .Include(i => i.Items)
                 .ThenInclude(p => p.Product)  
+                .ThenInclude(p => p.ComboProducts)
                 .Select(x => new DailyEntryDTO
                 {
                     Id = x.Id,
@@ -64,7 +67,7 @@ namespace SmartBurguerValueAPI.Repository
                     {
                         DailyEntryId = i.DailyEntryId,
                         Id = i.Id,
-                        Name = i.Name ?? i.Product.Name ?? "Sem nome",
+                        Name = i.Name ?? i.Product.Name ?? i.Combo.Name ?? "Nome não encontrado",
                         Quantity = i.Quantity,
                         TotalCPV = i.TotalCPV,
                         TotalRevenue = i.TotalRevenue

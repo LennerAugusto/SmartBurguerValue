@@ -150,6 +150,7 @@ namespace SmartBurguerValueAPI.Repository.ProductsRepository
                 Description = dto.Description,
                 EnterpriseId = dto.EnterpriseId,
                 SellingPrice = dto.SellingPrice,
+                ProductType = "Combo",
                 DesiredMargin = dto.DesiredMargin,
                 CPV = CPV,
                 CMV = CMV,
@@ -238,6 +239,7 @@ namespace SmartBurguerValueAPI.Repository.ProductsRepository
             combo.SugestedPrice = SuggestedPrice;
             combo.Markup = Markup;
             combo.Margin = Margin;
+            combo.ProductType = "Combo";
             combo.EnterpriseId = dto.EnterpriseId;
             combo.DateUpdated = DateTime.UtcNow;
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SmartBurguerValueAPI.Constants;
+using SmartBurguerValueAPI.DTOs;
 using SmartBurguerValueAPI.DTOs.Analysis;
 using SmartBurguerValueAPI.IRepository.IRepositoryBase;
 
@@ -17,5 +18,8 @@ namespace SmartBurguerValueAPI.Interfaces
         Task<List<BestSellingProductsByPeriodDTO>>GetBestSellingProductsByPeriod(EPeriod period, Guid enterpriseId);
         Task<List<ProductsBestMarginDTO>> GetProductsBestMargin(Guid enterpriseId);
         Task<List<ProductsBestMarginDTO>> GetCombosBestMargin(Guid enterpriseId);
+        Task<List<SalesDistributionDTO>> GetSalesDistributionByPeriod(EPeriod Period, Guid enterpriseId);
+        Task<GetCmvMarkupInvoicingDTO> GetCmvMarkupInvoicingByPeriod(EPeriod period, Guid enterpriseId);
+        Task<GetPurchaseDetailsDTO> GetPurchaseDetailsByPeriod(EPeriod Period, Guid enterpriseId);
     }
 }

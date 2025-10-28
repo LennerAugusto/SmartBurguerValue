@@ -31,7 +31,9 @@ namespace SmartBurguerValueAPI.Repository
         {
             var purchase = _context.Purchase
                 .Where(x => x.Id == purchaseId)
-                .Include(x => x.Items).FirstOrDefault();
+                .Include(x => x.Items)
+                .ThenInclude(x=> x.UnityOfMensure)
+                .FirstOrDefault();
             return _map.Map<PurchaseDTO>(purchase);
         }
 

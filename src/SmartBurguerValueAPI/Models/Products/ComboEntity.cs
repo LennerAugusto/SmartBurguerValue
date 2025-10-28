@@ -9,6 +9,7 @@ namespace SmartBurguerValueAPI.Models.Products
         public string Name { get; set; }
         public string? ImageUrl { get; set; }
         public string? Description { get; set; }
+        public string? ProductType { get; set; }
         [Column(TypeName = "decimal(10,2)")]
         public decimal? SellingPrice { get; set; }
         [Column(TypeName = "decimal(10,2)")]

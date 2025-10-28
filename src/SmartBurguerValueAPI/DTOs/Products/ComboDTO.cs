@@ -6,6 +6,7 @@
         public string Name { get; set; }
         public string ImageUrl { get; set; }
         public string? Description { get; set; }
+        public string? ProductType { get; set; }
         public decimal? SellingPrice { get; set; }
         public decimal? SugestedPrice { get; set; }
         public decimal? CPV { get; set; }

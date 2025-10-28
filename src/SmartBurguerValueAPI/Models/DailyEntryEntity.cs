@@ -9,7 +9,7 @@ namespace SmartBurguerValueAPI.Models
         public int? TotalOrders { get; set; }
         public Guid EnterpriseId { get; set; }
         [JsonIgnore]
-        public ICollection<DailyEntryItemEntity> Items { get; set; }
+        public ICollection<DailyEntryItemEntity> Items { get; set; } = new List<DailyEntryItemEntity>();
         [JsonIgnore]
         public EnterpriseEntity Enterprise { get; set; }
     }

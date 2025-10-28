@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using SmartBurguerValueAPI.Constants;
 using SmartBurguerValueAPI.Context;
+using SmartBurguerValueAPI.DTOs;
 using SmartBurguerValueAPI.DTOs.Analysis;
 using SmartBurguerValueAPI.Interfaces;
 using SmartBurguerValueAPI.Repository.Base;
@@ -101,7 +102,7 @@ namespace SmartBurguerValueAPI.Repository
                     ImageUrl = g.FirstOrDefault().Product.ImageUrl
                 })
                 .Where(x => x.ProductId != null)
-                .OrderByDescending(x => x.Quantity) 
+                .OrderByDescending(x => x.Quantity)
                 .ToListAsync();
 
             return result;
@@ -160,7 +161,7 @@ namespace SmartBurguerValueAPI.Repository
                     });
                 }
             }
-            else 
+            else
             {
                 var allItems = query.SelectMany(x => x.Items.DefaultIfEmpty());
                 series.Add(new InvoicingSeriesDTO
@@ -255,7 +256,7 @@ namespace SmartBurguerValueAPI.Repository
 
             var query = _context.DailyEntry
                 .Include(x => x.Items)
-                .Where(x => x.EntryDate >= startDate && x.EntryDate <= endDate 
+                .Where(x => x.EntryDate >= startDate && x.EntryDate <= endDate
                       && x.EnterpriseId == enterpriseId);
 
             var totalRevenue = await query
@@ -320,13 +321,13 @@ namespace SmartBurguerValueAPI.Repository
             {
                 var dailyCombos = await baseQuery
                     .SelectMany(d => d.Items
-                        .Where(i => i.ComboId != null) 
+                        .Where(i => i.ComboId != null)
                         .Select(i => new
                         {
                             Date = d.EntryDate.Date,
                             ComboId = i.ComboId,
                             ComboName = i.Combo != null ? i.Combo.Name : null,
-                            Quantity = i.Quantity 
+                            Quantity = i.Quantity
                         }))
                     .GroupBy(x => new { x.Date, x.ComboId, x.ComboName })
                     .Select(g => new
@@ -387,12 +388,12 @@ namespace SmartBurguerValueAPI.Repository
                     result.Add(new BestSellingProductsByPeriodDTO
                     {
                         Label = date.ToString("MMM"),
-                       NameProduct = top?.ComboName ?? "",
+                        NameProduct = top?.ComboName ?? "",
                         Quantity = top?.Quantity ?? 0
                     });
                 }
             }
-            else 
+            else
             {
                 var totalCombo = await baseQuery
                     .SelectMany(d => d.Items
@@ -581,5 +582,141 @@ namespace SmartBurguerValueAPI.Repository
 
             return query;
         }
+        public async Task<List<SalesDistributionDTO>> GetSalesDistributionByPeriod(EPeriod period, Guid enterpriseId)
+        {
+            DateTime startDate = SelectPeriod(period);
+            DateTime endDate = DateTime.UtcNow;
+
+            var query = _context.DailyEntry
+                .Include(x => x.Items)
+                .ThenInclude(i => i.Product)
+                .ThenInclude(i => i.ComboProducts)
+                .Where(x => x.EntryDate >= startDate &&
+                            x.EntryDate <= endDate &&
+                            x.EnterpriseId == enterpriseId);
+
+            var entries = await query.ToListAsync();
+
+            var allItems = entries.SelectMany(e => e.Items).ToList();
+
+            if (!allItems.Any())
+                return new List<SalesDistributionDTO>();
+
+            decimal totalSales = allItems.Sum(i => (decimal)(i.Quantity ?? 0));
+            var result = allItems
+                .GroupBy(i => i.Product != null ? i.Product.ProductType : "Combo")
+                .Select(g =>
+                {
+                    decimal groupSum = g.Sum(x => (decimal)(x.Quantity ?? 0));
+                    decimal percentage = totalSales == 0
+                        ? 0m
+                        : Math.Round((groupSum / totalSales) * 100m, 2);
+                    return new SalesDistributionDTO
+                    {
+                        Name = g.Key ?? "Não informado",
+                        Percentage = percentage
+                    };
+                })
+                .OrderByDescending(x => x.Percentage)
+                .ToList();
+            return result;
+        }
+        public async Task<GetCmvMarkupInvoicingDTO> GetCmvMarkupInvoicingByPeriod(EPeriod period, Guid enterpriseId)
+        {
+            DateTime startDate = SelectPeriod(period);
+            DateTime endDate = DateTime.UtcNow;
+            var query = _context.DailyEntry
+                .Include(x => x.Items)
+                .Where(x => x.EntryDate >= startDate && x.EntryDate <= endDate
+                    && x.EnterpriseId == enterpriseId);
+            var totalRevenue = await query
+                .SelectMany(x => x.Items)
+                .SumAsync(i => (decimal?)i.TotalRevenue ?? 0);
+            var totalDirectCost = await query
+                .SelectMany(x => x.Items)
+                .SumAsync(i => (decimal?)i.TotalCPV ?? 0);
+            var totalEmployeeMonthly = await _context.Employees
+       .Where(e => e.EnterpriseId == enterpriseId)
+       .SumAsync(e => (decimal?)e.MonthlySalary ?? 0);
+
+            var totalDays = (endDate - startDate).TotalDays;
+            var months = totalDays / 30.0;
+            var totalEmployeeCost = totalEmployeeMonthly * (decimal)months;
+            var totalFixedExpenses = await _context.FixedCosts
+                .Where(f =>
+                    f.EnterpriseId == enterpriseId &&
+                    f.IsPaid &&
+                    f.PaymentDate >= startDate &&
+                    f.PaymentDate <= endDate)
+                .SumAsync(f => (decimal?)f.Value ?? 0);
+            var totalGeneralCost = totalDirectCost + totalEmployeeCost + totalFixedExpenses;
+            var totalProfit = totalRevenue - totalGeneralCost;
+            var cmv = totalRevenue > 0
+                ? (totalDirectCost / totalRevenue) * 100
+                : 0;
+            var margin = totalRevenue > 0
+                ? (totalProfit / totalRevenue) * 100
+                : 0;
+            var markup = totalGeneralCost > 0
+                ? (totalRevenue / totalGeneralCost) * 100
+                : 0;
+            var totalGeneralRevenue = await _context.DailyEntry
+                .Where(x => x.EntryDate >= startDate && x.EntryDate <= endDate)
+                .SelectMany(x => x.Items)
+                .SumAsync(i => (decimal?)i.TotalRevenue ?? 0);
+            var revenueShare = totalGeneralRevenue > 0
+                ? (totalRevenue / totalGeneralRevenue) * 100
+                : 0;
+            return new GetCmvMarkupInvoicingDTO
+            {
+                Profit = Math.Round(totalProfit, 2),
+                Margin = Math.Round(margin, 2),
+                Markup = Math.Round(markup, 2),
+                Cmv = Math.Round(cmv, 2),
+            };
+        }
+        public async Task<GetPurchaseDetailsDTO> GetPurchaseDetailsByPeriod(EPeriod period, Guid enterpriseId)
+        {
+            DateTime startDate = SelectPeriod(period);
+            DateTime endDate = DateTime.UtcNow;
+
+            var query = _context.Purchase
+                .Include(x => x.Items)
+                .Where(x => x.PurchaseDate >= startDate && x.PurchaseDate <= endDate
+                    && x.EnterpriseId == enterpriseId);
+
+            var quantityPurchases = await query.CountAsync();
+
+            var totalSpent = await query
+                .SelectMany(x => x.Items)
+                .SumAsync(i => (decimal?)i.UnitPrice ?? 0);
+
+            var topSuppliers = await query
+       .GroupBy(x => x.SupplierName)
+       .Select(g => new
+       {
+           Supplier = g.Key,
+           Count = g.Count()
+       })
+       .OrderByDescending(g => g.Count)
+       .Take(5)
+       .Select(g => g.Supplier)
+       .ToListAsync();
+
+            var totalDays = (endDate - startDate).Days;
+            var dailyAverage = totalDays > 0 ? totalSpent / totalDays : 0;
+            var nextMonth = new DateTime(endDate.Year, endDate.Month, 1).AddMonths(1);
+            var daysInNextMonth = DateTime.DaysInMonth(nextMonth.Year, nextMonth.Month);
+            var projectedExpenses = dailyAverage * daysInNextMonth;
+
+            return new GetPurchaseDetailsDTO
+            {
+                TotalSpent = Math.Round(totalSpent, 2),
+                ProjectedExpensesNextMonth = Math.Round(projectedExpenses, 2),
+                TopSuppliers = topSuppliers,
+            };
+        }
+
+
     }
 }

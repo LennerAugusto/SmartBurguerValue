@@ -12,6 +12,7 @@
         public decimal? Markup { get; set; }
         public decimal? Margin { get; set; }
         public string? ImageUrl { get; set; }
+        public string? ProductType { get; set; }
         public Guid EnterpriseId { get; set; }
         public List<ProductIngredientDTO> Ingredients { get; set; }
     }

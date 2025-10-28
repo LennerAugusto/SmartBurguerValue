@@ -28,6 +28,7 @@ namespace SmartBurguerValueAPI.Repository
         public IFinancialSnapshotsRepository _FinancialSnapshotsRep;
         public IProductCostAnalysisRepository _ProductCostAnalysisRep;
         public IAnalysisByPeriodRepository _AnalysisByPeriodRep;
+        public IAnalysisByPeriodYearsRepository _AnalysisByPeriodYearsRep;
         public AppDbContext _context;
 
         public UnityOfWork(AppDbContext context, IMapper mapper)
@@ -106,6 +107,10 @@ namespace SmartBurguerValueAPI.Repository
         public IAnalysisByPeriodRepository AnalysisByPeriodRepository
         {
             get { return _AnalysisByPeriodRep = _AnalysisByPeriodRep ?? new AnalysisByPeriodRepository(_context); }
+        }
+        public IAnalysisByPeriodYearsRepository AnalysisByPeriodYearsRepository
+        {
+            get { return _AnalysisByPeriodYearsRep = _AnalysisByPeriodYearsRep ?? new AnalysisByPeriodYearRepository(_context); }
         }
         public async Task CommitAsync()
         {

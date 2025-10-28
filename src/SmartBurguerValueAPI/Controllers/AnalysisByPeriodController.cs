@@ -81,5 +81,23 @@ namespace SmartBurguerValueAPI.Controllers
             var Products = await _unityOfWork.AnalysisByPeriodRepository.GetCombosBestMargin(EnterpriseId);
             return Ok(Products);
         }
+        [HttpPost("sales-distribution/by-enterprise-id")]
+        public async Task<ActionResult<List<ProductsBestMarginDTO>>> GetSalesDistribution([FromBody] AnalysisRequestDTO analysis)
+        {
+            var Products = await _unityOfWork.AnalysisByPeriodRepository.GetSalesDistributionByPeriod(analysis.Period, analysis.EnterpriseId);
+            return Ok(Products);
+        }
+        [HttpPost("markup-cmv-/by-enterprise-id")]
+        public async Task<ActionResult<GetCmvMarkupInvoicingDTO>> GetCmvMarkupInvoicing([FromBody] AnalysisRequestDTO analysis)
+        {
+            var Products = await _unityOfWork.AnalysisByPeriodRepository.GetCmvMarkupInvoicingByPeriod(analysis.Period, analysis.EnterpriseId);
+            return Ok(Products);
+        }
+        [HttpPost("purchase-details/by-enterprise-id")]
+        public async Task<ActionResult<GetPurchaseDetailsDTO>> GetPurchaseDetails([FromBody] AnalysisRequestDTO analysis)
+        {
+            var Products = await _unityOfWork.AnalysisByPeriodRepository.GetPurchaseDetailsByPeriod(analysis.Period, analysis.EnterpriseId);
+            return Ok(Products);
+        }
     }
 }
