@@ -21,5 +21,6 @@ namespace SmartBurguerValueAPI.Interfaces
         Task<List<SalesDistributionDTO>> GetSalesDistributionByPeriod(EPeriod Period, Guid enterpriseId);
         Task<GetCmvMarkupInvoicingDTO> GetCmvMarkupInvoicingByPeriod(EPeriod period, Guid enterpriseId);
         Task<GetPurchaseDetailsDTO> GetPurchaseDetailsByPeriod(EPeriod Period, Guid enterpriseId);
+        Task<List<TotalOrdersDTO>> GetPurchaseExpanseByPeriod(EPeriod Period, Guid enterpriseId);
     }
 }

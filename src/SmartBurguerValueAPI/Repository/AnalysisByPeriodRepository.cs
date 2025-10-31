@@ -66,9 +66,6 @@ namespace SmartBurguerValueAPI.Repository
                 .SelectMany(x => x.Items.DefaultIfEmpty())
                 .SumAsync(i => i != null ? i.TotalRevenue : 0);
 
-            //var totalExpansesEmployee = await _context.Employees
-            //    .SumAsync(i => i != null ? i.MonthlySalary : 0);
-
             var totalOrders = await query.CountAsync();
             var averageTicket = totalOrders > 0 ? totalSales / totalOrders : 0;
             return new InitialAnalysiDTO
@@ -717,6 +714,79 @@ namespace SmartBurguerValueAPI.Repository
             };
         }
 
+        public async Task<List<TotalOrdersDTO>> GetPurchaseExpanseByPeriod(EPeriod period, Guid enterpriseId)
+        {
+            var range = GetPeriod(period);
+            DateTime start = range.Start;
+            DateTime end = range.End.Date.AddDays(1).AddTicks(-1);
 
+            string granularity = period switch
+            {
+                EPeriod.LastWeek => "day",
+                EPeriod.LastFourWeeks => "day",
+                EPeriod.LastSemester => "month",
+                EPeriod.LastYear => "month",
+                EPeriod.SinceTheBeginning => "total",
+                _ => "total"
+            };
+
+            var query = _context.Purchase
+                .Where(x => x.PurchaseDate >= start && x.PurchaseDate <= end && x.EnterpriseId == enterpriseId);
+
+            List<TotalOrdersDTO> series = new();
+
+            if (granularity == "day")
+            {
+                var dailyTotals = await query
+                    .GroupBy(x => x.PurchaseDate.Date)
+                    .Select(g => new { Date = g.Key, Orders = g.Sum(i => i.TotalAmount) })
+                    .ToListAsync();
+
+                for (var date = start.Date; date <= end.Date; date = date.AddDays(1))
+                {
+                    var total = dailyTotals.FirstOrDefault(x => x.Date == date)?.Orders ?? 0;
+                    series.Add(new TotalOrdersDTO
+                    {
+                        Label = date.ToString("dd/MM"),
+                        Orders = total
+                    });
+                }
+            }
+            else if (granularity == "month")
+            {
+                var monthlyTotals = await query
+                    .GroupBy(x => new { x.PurchaseDate.Year, x.PurchaseDate.Month })
+                    .Select(g => new
+                    {
+                        g.Key.Year,
+                        g.Key.Month,
+                        Orders = g.Sum(i => i.TotalAmount)
+                    })
+                    .ToListAsync();
+
+                for (var date = new DateTime(start.Year, start.Month, 1); date <= end; date = date.AddMonths(1))
+                {
+                    var total = monthlyTotals
+                        .FirstOrDefault(x => x.Year == date.Year && x.Month == date.Month)?.Orders ?? 0;
+
+                    series.Add(new TotalOrdersDTO
+                    {
+                        Label = date.ToString("MMM"),
+                        Orders = total
+                    });
+                }
+            }
+            else
+            {
+                var totalOrders = await query.SumAsync(i => i.TotalAmount);
+                series.Add(new TotalOrdersDTO
+                {
+                    Label = "Total",
+                    Orders = totalOrders
+                });
+            }
+            return series;
+        }
     }
+
 }
