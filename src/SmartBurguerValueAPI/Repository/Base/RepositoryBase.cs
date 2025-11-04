@@ -15,11 +15,12 @@ namespace SmartBurguerValueAPI.Repository.Base
             _context = context;
         }
 
-        public async Task Create(T entity)
+        public async Task<T> Create(T entity)
         {
             entity.DateCreated = entity.DateCreated == new DateTime() ? DateTime.Now : entity.DateCreated;
             entity.DateUpdated = DateTime.Now;
-            _context.Set<T>().Add(entity);
+            var entry = await _context.Set<T>().AddAsync(entity);
+            return entry.Entity;
         }
         public async Task Delete(T entity)
         {

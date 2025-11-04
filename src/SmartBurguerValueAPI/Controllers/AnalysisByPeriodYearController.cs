@@ -1,4 +1,5 @@
 ﻿using DTOs.Analysis;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SmartBurguerValueAPI.Context;
 using SmartBurguerValueAPI.DTOs.Analysis;
@@ -6,7 +7,7 @@ using SmartBurguerValueAPI.Interfaces;
 
 namespace SmartBurguerValueAPI.Controllers
 {
-    //[Authorize(Policy = "Enterprise")]
+    [Authorize(Policy = "Enterprise")]
     [Microsoft.AspNetCore.Mvc.Route("api/analysis-year")]
     public class AnalysisByPeriodYearController : ControllerBase
     {

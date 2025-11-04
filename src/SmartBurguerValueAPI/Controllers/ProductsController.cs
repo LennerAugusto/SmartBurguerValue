@@ -1,4 +1,5 @@
-﻿ using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Newtonsoft.Json;
@@ -12,7 +13,7 @@ using SmartBurguerValueAPI.Pagination;
 
 namespace SmartBurguerValueAPI.Controllers
 {
-    //[Authorize(Policy = "Enterprise")]
+    [Authorize(Policy = "Enterprise")]
     [Route("api/products")]
     public class ProductsController : ControllerBase
     {

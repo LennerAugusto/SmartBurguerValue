@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SmartBurguerValueAPI.Context;
@@ -11,7 +12,7 @@ using SmartBurguerValueAPI.Pagination;
 
 namespace SmartBurguerValueAPI.Controllers
 {
-    //[Authorize(Policy = "Enterprise")]
+    [Authorize(Policy = "Enterprise")]
     [Route("api/fixed-coast")]
     public class FixedCostController : ControllerBase
     {

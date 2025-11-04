@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SmartBurguerValueAPI.Context;
 using SmartBurguerValueAPI.Interfaces;
 using SmartBurguerValueAPI.Models;
 
 namespace SmartBurguerValueAPI.Controllers
 {
-    //[Authorize(Policy = "Enterprise")]
+    [Authorize(Policy = "Enterprise")]
     [Microsoft.AspNetCore.Mvc.Route("api/financial-snapshots")]
     public class FinancialSnapshotsController: ControllerBase
     {

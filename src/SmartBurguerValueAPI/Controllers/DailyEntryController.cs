@@ -7,7 +7,7 @@ using SmartBurguerValueAPI.Models;
 
 namespace SmartBurguerValueAPI.Controllers
 {
-    //[Authorize(Policy = "Enterprise")]
+    [Authorize(Policy = "Enterprise")]
     [Route("api/daily-entry")]
     public class DailyEntryController : ControllerBase
     {

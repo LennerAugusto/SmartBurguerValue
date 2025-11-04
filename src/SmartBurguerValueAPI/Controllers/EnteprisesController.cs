@@ -37,11 +37,11 @@ namespace SmartBurguerValueAPI.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<ActionResult<EnterpriseDTO>> CreateEnterprise([FromBody] EnterpriseEntity enterprise)
+        public async Task<EnterpriseEntity> CreateEnterprise([FromBody] EnterpriseEntity enterprise)
         {
-            var Enterprise = _unityOfWork.EnterpriseRepository.Create(enterprise);
+            var Enterprise = await _unityOfWork.EnterpriseRepository.Create(enterprise);
             await _unityOfWork.CommitAsync();
-            return Ok(Enterprise);
+            return Enterprise;
         }
 
 

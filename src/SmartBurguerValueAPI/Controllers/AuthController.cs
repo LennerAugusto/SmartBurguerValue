@@ -210,31 +210,31 @@ namespace SmartBurguerValueAPI.Controllers
         [HttpPost]
         [Route("AddUserToRole")]
         [Authorize(Policy = "Admin")]
-        public async Task<IActionResult> AddUserToRole(string email, string roleName)
+        public async Task<IActionResult> AddUserToRole([FromBody] AddUserToRoleDTO userToRole)
         {
-            var user = await _userManager.FindByEmailAsync(email);
+            var user = await _userManager.FindByEmailAsync(userToRole.Email);
 
             if (user != null)
             {
-                var result = await _userManager.AddToRoleAsync(user, roleName);
+                var result = await _userManager.AddToRoleAsync(user, userToRole.RoleName);
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation(1, $"User {user.Email} added to the {roleName} role");
+                    _logger.LogInformation(1, $"User {user.Email} added to the {userToRole.RoleName} role");
                     return StatusCode(StatusCodes.Status200OK,
                            new Response
                            {
                                Status = "Success",
                                Message =
-                           $"User {user.Email} added to the {roleName} role"
+                           $"User {user.Email} added to the {userToRole.RoleName} role"
                            });
                 }
                 else
                 {
-                    _logger.LogInformation(1, $"Error: Unable to add user {user.Email} to the {roleName} role");
+                    _logger.LogInformation(1, $"Error: Unable to add user {user.Email} to the {userToRole.RoleName} role");
                     return StatusCode(StatusCodes.Status400BadRequest, new Response
                     {
                         Status = "Error",
-                        Message = $"Error: Unable to add user {user.Email} to the {roleName} role"
+                        Message = $"Error: Unable to add user {user.Email} to the {userToRole.RoleName} role"
                     });
                 }
             }

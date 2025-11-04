@@ -8,7 +8,7 @@ using SmartBurguerValueAPI.Interfaces;
 
 namespace SmartBurguerValueAPI.Controllers
 {
-    //[Authorize(Policy = "Enterprise")]
+    [Authorize(Policy = "Enterprise")]
     [Microsoft.AspNetCore.Mvc.Route("api/analysis")]
     public class AnalysisByPeriodController : ControllerBase
     {
