@@ -11,6 +11,8 @@ namespace SmartBurguerValueAPI.Interfaces
         Task  CreateEmployee(EmployeeDTO employee);
         Task UpdateEmployee(EmployeeDTO employee);
         Task<List<EmployeeDTO>> GetAllEmployeeByEnterpriseId(Guid enterpriseId);
+        List<WeekDaysCountDTO> GetWeekdayCountsInCurrentMonth();
+        Task<List<GraphGenericDTO>> PositionDistribution(Guid EnterpriseId);
 
     }
 }

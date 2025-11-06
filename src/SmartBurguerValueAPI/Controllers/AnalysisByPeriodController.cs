@@ -7,7 +7,7 @@ using SmartBurguerValueAPI.DTOs.Products;
 using SmartBurguerValueAPI.Interfaces;
 
 namespace SmartBurguerValueAPI.Controllers
-{
+ {
     [Authorize(Policy = "Enterprise")]
     [Microsoft.AspNetCore.Mvc.Route("api/analysis")]
     public class AnalysisByPeriodController : ControllerBase
@@ -103,6 +103,18 @@ namespace SmartBurguerValueAPI.Controllers
         public async Task<ActionResult<GetPurchaseDetailsDTO>> GetPurchaseExpansse([FromBody] AnalysisRequestDTO analysis)
         {
             var PurchaseExpansse = await _unityOfWork.AnalysisByPeriodRepository.GetPurchaseExpanseByPeriod(analysis.Period, analysis.EnterpriseId);
+            return Ok(PurchaseExpansse);
+        }
+        [HttpPost("employes-analysis/by-enterprise-id")]
+        public async Task<ActionResult<GetEmployeesAnalysisDTO>> GetEmployesAnalysis([FromBody] AnalysisRequestDTO analysis)
+        {
+            var PurchaseExpansse = await _unityOfWork.AnalysisByPeriodRepository.GetEmployeesAnalysis(analysis.Period, analysis.EnterpriseId);
+            return Ok(PurchaseExpansse);
+        }
+        [HttpPost("employes-cost-analysis/by-enterprise-id")]
+        public async Task<ActionResult<GetEmployeesCostByPeriodDTO>> GetEmployesCostAnalysisByPeriod([FromBody] AnalysisRequestDTO analysis)
+        {
+            var PurchaseExpansse = await _unityOfWork.AnalysisByPeriodRepository.GetTotalEmployeeCostByPeriod(analysis.Period, analysis.EnterpriseId);
             return Ok(PurchaseExpansse);
         }
     }

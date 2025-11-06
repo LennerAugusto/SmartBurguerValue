@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SmartBurguerValueAPI.Constants;
 using SmartBurguerValueAPI.Context;
 using SmartBurguerValueAPI.DTOs;
+using SmartBurguerValueAPI.DTOs.Analysis;
 using SmartBurguerValueAPI.Interfaces;
 using SmartBurguerValueAPI.Models;
 using SmartBurguerValueAPI.Pagination;
@@ -49,7 +51,7 @@ namespace SmartBurguerValueAPI.Repository
                 }
             }
         }
-        public async Task <List<EmployeeDTO>> GetAllEmployeeByEnterpriseId(Guid enterpriseId)
+        public async Task<List<EmployeeDTO>> GetAllEmployeeByEnterpriseId(Guid enterpriseId)
         {
             var query = _context.Set<EmployeeEntity>()
                 .Where(x => x.EnterpriseId == enterpriseId)
@@ -64,10 +66,10 @@ namespace SmartBurguerValueAPI.Repository
                     EnterpriseId = x.EnterpriseId,
                     IsActive = x.IsActive,
                     WorkSchedules = x.EmployeeSchedules.Select(ws => new WorkScheduleDTO
-                      {
-                          Weekday = ws.WeekDay,
-                          DailyRate = ws.DailyRate
-                      }).ToList()
+                    {
+                        Weekday = ws.WeekDay,
+                        DailyRate = ws.DailyRate
+                    }).ToList()
                 });
 
             return await query.ToListAsync();
@@ -88,9 +90,9 @@ namespace SmartBurguerValueAPI.Repository
 
             if (dto.EmploymentType == "Daily")
             {
-                    var oldSchedules = await _context.EmployeesWorkSchedule
-                    .Where(ws => ws.EmployeeId == employee.Id)
-                    .ToListAsync();
+                var oldSchedules = await _context.EmployeesWorkSchedule
+                .Where(ws => ws.EmployeeId == employee.Id)
+                .ToListAsync();
 
                 _context.EmployeesWorkSchedule.RemoveRange(oldSchedules);
 
@@ -120,5 +122,59 @@ namespace SmartBurguerValueAPI.Repository
 
             await _context.SaveChangesAsync();
         }
+        public  List<WeekDaysCountDTO> GetWeekdayCountsInCurrentMonth()
+        {
+            var now = DateTime.Now;
+            int year = now.Year;
+            int month = now.Month;
+
+            int daysInMonth = DateTime.DaysInMonth(year, month);
+
+            var weekdayCounts = Enum.GetValues(typeof(DayOfWeek))
+                .Cast<DayOfWeek>()
+                .ToDictionary(d => d, d => 0);
+
+            for (int day = 1; day <= daysInMonth; day++)
+            {
+                var currentDate = new DateTime(year, month, day);
+                weekdayCounts[currentDate.DayOfWeek]++;
+            }
+
+            var dayNamesPt = new Dictionary<DayOfWeek, string>
+            {
+                { DayOfWeek.Sunday, "Domingo" },
+                { DayOfWeek.Monday, "Segunda" },
+                { DayOfWeek.Tuesday, "Terça" },
+                { DayOfWeek.Wednesday, "Quarta" },
+                { DayOfWeek.Thursday, "Quinta" },
+                { DayOfWeek.Friday, "Sexta" },
+                { DayOfWeek.Saturday, "Sábado" },
+            };
+
+            var result = weekdayCounts
+                .Select(w => new WeekDaysCountDTO
+                {
+                    NameDay = dayNamesPt[w.Key],
+                    Quantity = w.Value
+                })
+                .ToList();
+
+            return result;
+        }
+        public async Task<List<GraphGenericDTO>> PositionDistribution(Guid enterpriseId)
+        {
+
+            var query = await _context.Employees
+                .Where(e => e.EnterpriseId == enterpriseId)
+                .GroupBy(e => e.Position)
+                .Select(g => new GraphGenericDTO
+                {
+                    Name = g.Key,
+                    Total = g.Count()
+                }).ToListAsync();
+
+            return query;
+        }
+
     }
 }

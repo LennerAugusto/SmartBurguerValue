@@ -6,5 +6,7 @@
         public decimal Markup { get; set; }
         public decimal Margin { get; set; }
         public decimal Profit { get; set; }
+        public decimal TotalCostEmployees { get; set; }
+        public decimal TotalCostAccounts { get; set; }
     }
 }

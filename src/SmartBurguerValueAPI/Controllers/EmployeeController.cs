@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SmartBurguerValueAPI.Context;
 using SmartBurguerValueAPI.DTOs;
+using SmartBurguerValueAPI.DTOs.Analysis;
 using SmartBurguerValueAPI.Interfaces;
 using SmartBurguerValueAPI.Models;
 using SmartBurguerValueAPI.Models.Products;
@@ -10,7 +11,7 @@ using SmartBurguerValueAPI.Pagination;
 
 namespace SmartBurguerValueAPI.Controllers
 {
-    [Authorize(Policy = "Enterprise")]
+    //[Authorize(Policy = "Enterprise")]
     [Route("api/employee")]
     public class EmployeeController : ControllerBase
     {
@@ -65,6 +66,18 @@ namespace SmartBurguerValueAPI.Controllers
             await _unityOfWork.EmployeeRepository.Delete(Employee);
             await _unityOfWork.CommitAsync();
             return Ok(Employee);
+        }
+        [HttpGet("quantity-week-days/get-all")]
+        public async Task<ActionResult<IEnumerable<WeekDaysCountDTO>>> GetAllWeekDaysCount()
+        {
+            var WeekDays =  _unityOfWork.EmployeeRepository.GetWeekdayCountsInCurrentMonth();
+            return Ok(WeekDays);
+        }
+        [HttpGet("position-distribution/by-enterprise-id")]
+        public async Task<ActionResult<GetEmployeesCostByPeriodDTO>> GetEmployesCostAnalysisByPeriod(Guid EnterpriseId)
+        {
+            var PurchaseExpansse = await _unityOfWork.EmployeeRepository.PositionDistribution(EnterpriseId);
+            return Ok(PurchaseExpansse);
         }
     }
 }

@@ -66,7 +66,7 @@ namespace SmartBurguerValueAPI.Repository
                 .SelectMany(x => x.Items.DefaultIfEmpty())
                 .SumAsync(i => i != null ? i.TotalRevenue : 0);
 
-            var totalOrders = await query.CountAsync();
+            var totalOrders = await query.SumAsync(x => x.TotalOrders);
             var averageTicket = totalOrders > 0 ? totalSales / totalOrders : 0;
             return new InitialAnalysiDTO
             {
@@ -632,13 +632,52 @@ namespace SmartBurguerValueAPI.Repository
             var totalDirectCost = await query
                 .SelectMany(x => x.Items)
                 .SumAsync(i => (decimal?)i.TotalCPV ?? 0);
-            var totalEmployeeMonthly = await _context.Employees
-       .Where(e => e.EnterpriseId == enterpriseId)
-       .SumAsync(e => (decimal?)e.MonthlySalary ?? 0);
+            var totalEmployeeCost = 0m;
 
+            var employees = await _context.Employees
+                .Include(e => e.EmployeeSchedules)
+                .Where(e => e.EnterpriseId == enterpriseId).ToListAsync();
+            foreach (var emp in employees)
+            {
+                if (emp.DateCreated > endDate)
+                    continue;
+                var effectiveStart = emp.DateCreated > startDate ? emp.DateCreated.Date : startDate.Date;
+                DateTime? possibleDateUpdated = emp.DateUpdated == default(DateTime) ? (DateTime?)null : emp.DateUpdated;
+
+                var effectiveEnd = emp.IsActive
+                    ? endDate.Date
+                    : (possibleDateUpdated.HasValue && possibleDateUpdated.Value < endDate.Date
+                        ? possibleDateUpdated.Value.Date
+                        : endDate.Date);
+                if (effectiveEnd <= effectiveStart)
+                    continue;
+                if (emp.EmployeeSchedules == null || emp.EmployeeSchedules.Count == 0)
+                {
+                    var activeDays = (effectiveEnd - effectiveStart).TotalDays;
+                    if (activeDays <= 0) continue;
+
+                    var proportionalMonths = (decimal)(activeDays / 30.0);
+                    totalEmployeeCost += (decimal)(emp.MonthlySalary * proportionalMonths);
+                }
+                else
+                {
+                    var workedDaysCount = 0;
+                    for (var day = effectiveStart; day <= effectiveEnd; day = day.AddDays(1))
+                    {
+                        var dayOfWeekStr = day.DayOfWeek.ToString(); 
+                        var schedule = emp.EmployeeSchedules
+                            .FirstOrDefault(ws => ws.WeekDay.Equals(dayOfWeekStr, StringComparison.OrdinalIgnoreCase));
+
+                        if (schedule != null)
+                        {
+                            workedDaysCount++;
+                            totalEmployeeCost += schedule.DailyRate;
+                        }
+                    }
+                }
+            }
             var totalDays = (endDate - startDate).TotalDays;
             var months = totalDays / 30.0;
-            var totalEmployeeCost = totalEmployeeMonthly * (decimal)months;
             var totalFixedExpenses = await _context.FixedCosts
                 .Where(f =>
                     f.EnterpriseId == enterpriseId &&
@@ -670,6 +709,8 @@ namespace SmartBurguerValueAPI.Repository
                 Margin = Math.Round(margin, 2),
                 Markup = Math.Round(markup, 2),
                 Cmv = Math.Round(cmv, 2),
+                TotalCostEmployees = Math.Round(totalEmployeeCost, 2),
+                TotalCostAccounts = Math.Round(totalFixedExpenses, 2),
             };
         }
         public async Task<GetPurchaseDetailsDTO> GetPurchaseDetailsByPeriod(EPeriod period, Guid enterpriseId)
@@ -787,6 +828,191 @@ namespace SmartBurguerValueAPI.Repository
             }
             return series;
         }
+        public async Task<GetEmployeesAnalysisDTO> GetEmployeesAnalysis(EPeriod period, Guid enterpriseId)
+        {
+
+            DateTime startDate = SelectPeriod(period);
+            DateTime endDate = DateTime.UtcNow;
+
+            var employees = await _context.Employees
+                  .Where(e => e.EnterpriseId == enterpriseId)
+                  .Select(e => new { e.MonthlySalary, e.DateCreated }).ToListAsync();
+           var totalEmployeeCost = 0m;
+            foreach (var emp in employees)
+            {
+                if (emp.DateCreated > endDate)
+                    continue;
+
+                var effectiveStart = emp.DateCreated > startDate ? emp.DateCreated : startDate;
+                var effectiveEnd = endDate;
+                var activeDays = (effectiveEnd - effectiveStart).TotalDays;
+                if (activeDays <= 0) continue;
+                var proportionalMonths = activeDays / 30.0;
+               totalEmployeeCost = (decimal)(emp.MonthlySalary * (decimal)proportionalMonths);
+            }
+
+            return new GetEmployeesAnalysisDTO
+            {
+               TotalEmployeesActive = employees.Count(e => e.DateCreated <= endDate),
+               TotalSalaries = Math.Round((decimal)totalEmployeeCost, 2)
+            };
+        }
+        public async Task<List<GetEmployeesCostByPeriodDTO>> GetTotalEmployeeCostByPeriod(EPeriod period, Guid enterpriseId)
+        {
+            var range = GetPeriod(period);
+            DateTime start = range.Start.Date;
+            DateTime end = range.End.Date;
+
+            string granularity = period switch
+            {
+                EPeriod.LastWeek => "day",
+                EPeriod.LastFourWeeks => "day",
+                EPeriod.LastSemester => "month",
+                EPeriod.LastYear => "month",
+                EPeriod.SinceTheBeginning => "total",
+                _ => "total"
+            };
+
+            var employees = await _context.Employees
+                .Include(e => e.EmployeeSchedules)
+                .Where(e => e.EnterpriseId == enterpriseId)
+                .Select(e => new
+                {
+                    e.Id,
+                    e.MonthlySalary,
+                    e.DateCreated,
+                    e.IsActive,
+                    e.DateUpdated,
+                    WorkSchedules = e.EmployeeSchedules.Select(ws => new { ws.WeekDay, ws.DailyRate }).ToList()
+                })
+                .ToListAsync();
+
+            List<GetEmployeesCostByPeriodDTO> series = new();
+
+            if (granularity == "day")
+            {
+                for (var date = start; date <= end; date = date.AddDays(1))
+                {
+                    decimal totalCost = 0;
+
+                    foreach (var emp in employees)
+                    {
+                        if (emp.DateCreated > date) continue;
+
+                        DateTime? dateUpdated = emp.DateUpdated == default ? (DateTime?)null : emp.DateUpdated;
+                        if (!emp.IsActive && dateUpdated.HasValue && dateUpdated.Value < date)
+                            continue;
+                        // Mensalista
+                        if (emp.WorkSchedules == null || emp.WorkSchedules.Count == 0)
+                        {
+                            totalCost += (decimal)(emp.MonthlySalary / 30m);
+                        }
+                        else
+                        {
+                            var dayOfWeek = date.DayOfWeek.ToString();
+                            var schedule = emp.WorkSchedules.FirstOrDefault(ws =>
+                                ws.WeekDay.Equals(dayOfWeek, StringComparison.OrdinalIgnoreCase));
+
+                            if (schedule != null)
+                                totalCost += schedule.DailyRate;
+                        }
+                    }
+
+                    series.Add(new GetEmployeesCostByPeriodDTO
+                    {
+                        Label = date.ToString("dd/MM"),
+                        Cost = Math.Round(totalCost, 2)
+                    });
+                }
+            }
+            else if (granularity == "month")
+            {
+                for (var month = new DateTime(start.Year, start.Month, 1);
+                     month <= end;
+                     month = month.AddMonths(1))
+                {
+                    DateTime monthEnd = new DateTime(month.Year, month.Month, DateTime.DaysInMonth(month.Year, month.Month));
+                    if (monthEnd > end) monthEnd = end;
+
+                    decimal totalCost = 0;
+
+                    foreach (var emp in employees)
+                    {
+                        if (emp.DateCreated > monthEnd) continue;
+
+                        DateTime? dateUpdated = emp.DateUpdated == default ? (DateTime?)null : emp.DateUpdated;
+                        if (!emp.IsActive && dateUpdated.HasValue && dateUpdated.Value < month)
+                            continue;
+
+                        if (emp.WorkSchedules == null || emp.WorkSchedules.Count == 0)
+                        {
+                            // Mensalista
+                            totalCost += (decimal)emp.MonthlySalary;
+                        }
+                        else
+                        {
+                            decimal total = 0;
+                            for (var date = month; date <= monthEnd; date = date.AddDays(1))
+                            {
+                                var dayOfWeek = date.DayOfWeek.ToString();
+                                var schedule = emp.WorkSchedules.FirstOrDefault(ws =>
+                                    ws.WeekDay.Equals(dayOfWeek, StringComparison.OrdinalIgnoreCase));
+                                if (schedule != null)
+                                    total += schedule.DailyRate;
+                            }
+                            totalCost += total;
+                        }
+                    }
+
+                    series.Add(new GetEmployeesCostByPeriodDTO
+                    {
+                        Label = month.ToString("MMM"),
+                        Cost = Math.Round(totalCost, 2)
+                    });
+                }
+            }
+            else
+            {
+                decimal totalCost = 0;
+
+                foreach (var emp in employees)
+                {
+                    if (emp.DateCreated > end) continue;
+
+                    DateTime? dateUpdated = emp.DateUpdated == default ? (DateTime?)null : emp.DateUpdated;
+                    DateTime effectiveStart = emp.DateCreated > start ? emp.DateCreated : start;
+                    DateTime effectiveEnd = emp.IsActive ? end : (dateUpdated.HasValue && dateUpdated.Value < end ? dateUpdated.Value : end);
+
+                    if (effectiveEnd < effectiveStart)
+                        continue;
+
+                    if (emp.WorkSchedules == null || emp.WorkSchedules.Count == 0)
+                    {
+                        // Mensalista
+                        var activeDays = (effectiveEnd - effectiveStart).TotalDays;
+                        totalCost += (decimal)(emp.MonthlySalary * (decimal)(activeDays / 30.0));
+                    }
+                    else
+                    {
+                        for (var date = effectiveStart.Date; date <= effectiveEnd.Date; date = date.AddDays(1))
+                        {
+                            var dayOfWeek = date.DayOfWeek.ToString();
+                            var schedule = emp.WorkSchedules.FirstOrDefault(ws =>
+                                ws.WeekDay.Equals(dayOfWeek, StringComparison.OrdinalIgnoreCase));
+                            if (schedule != null)
+                                totalCost += schedule.DailyRate;
+                        }
+                    }
+                }
+                series.Add(new GetEmployeesCostByPeriodDTO
+                {
+                    Label = "Total",
+                    Cost = Math.Round(totalCost, 2)
+                });
+            }
+            return series;
+        }
+
     }
 
 }
