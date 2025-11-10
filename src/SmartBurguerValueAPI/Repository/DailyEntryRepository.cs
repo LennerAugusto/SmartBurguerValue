@@ -84,32 +84,40 @@ namespace SmartBurguerValueAPI.Repository
 
             if (entry == null)
                 throw new KeyNotFoundException("Lançamento diário não encontrado.");
-
             entry.EntryDate = dto.EntryDate;
             entry.Description = dto.Description;
+            entry.TotalOrders = dto.TotalOrders;
             entry.DateUpdated = DateTime.UtcNow;
 
-            entry.TotalOrders = dto.TotalOrders;
-
-            _context.DailyEntryItem.RemoveRange(entry.Items);
-
-            var newItems = dto.Items.Select(i => new DailyEntryItemEntity
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                DailyEntryId = entry.Id,
-                ProductId = i.ProductId,
-                ComboId = i.ComboId,
-                Name = i.Name,
-                Quantity = i.Quantity,
-                TotalCPV = i.TotalCPV,
-                TotalRevenue = i.TotalRevenue,
-                DateCreated = DateTime.UtcNow,
-                DateUpdated = DateTime.UtcNow,
-                IsActive = true
-            }).ToList();
+                _context.DailyEntryItem.RemoveRange(entry.Items);
+                var newItems = dto.Items.Select(i => new DailyEntryItemEntity
+                {
+                    Id = Guid.NewGuid(),
+                    DailyEntryId = entry.Id,
+                    ProductId = i.ProductId,
+                    ComboId = i.ComboId,
+                    Name = i.Name,
+                    Quantity = i.Quantity,
+                    TotalCPV = i.TotalCPV,
+                    TotalRevenue = i.TotalRevenue,
+                    IsActive = true,
+                    DateCreated = DateTime.UtcNow,
+                    DateUpdated = DateTime.UtcNow
+                }).ToList();
 
-            _context.DailyEntryItem.AddRange(newItems);
+                await _context.DailyEntryItem.AddRangeAsync(newItems);
 
-            await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
 

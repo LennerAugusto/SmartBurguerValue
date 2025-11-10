@@ -258,7 +258,7 @@ namespace SmartBurguerValueAPI.Migrations
 
                     b.HasIndex("EnterpriseId");
 
-                    b.ToTable("DailyEntry");
+                    b.ToTable("DailyEntry", (string)null);
                 });
 
             modelBuilder.Entity("SmartBurguerValueAPI.Models.DailyEntryItemEntity", b =>
@@ -311,7 +311,7 @@ namespace SmartBurguerValueAPI.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("DailyEntryItem");
+                    b.ToTable("DailyEntryItem", (string)null);
                 });
 
             modelBuilder.Entity("SmartBurguerValueAPI.Models.EmployeeEntity", b =>
@@ -348,7 +348,7 @@ namespace SmartBurguerValueAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Employees");
+                    b.ToTable("Employees", (string)null);
                 });
 
             modelBuilder.Entity("SmartBurguerValueAPI.Models.EmployeeWorkScheduleEntity", b =>
@@ -380,7 +380,7 @@ namespace SmartBurguerValueAPI.Migrations
 
                     b.HasIndex("EmployeeId");
 
-                    b.ToTable("EmployeesWorkSchedule");
+                    b.ToTable("EmployeesWorkSchedule", (string)null);
                 });
 
             modelBuilder.Entity("SmartBurguerValueAPI.Models.EnterpriseEntity", b =>
@@ -429,7 +429,7 @@ namespace SmartBurguerValueAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Enterprise");
+                    b.ToTable("Enterprise", (string)null);
                 });
 
             modelBuilder.Entity("SmartBurguerValueAPI.Models.FinancialSnapshotEntity", b =>
@@ -475,7 +475,7 @@ namespace SmartBurguerValueAPI.Migrations
 
                     b.HasIndex("EnterpriseId");
 
-                    b.ToTable("FinancialSnapshots");
+                    b.ToTable("FinancialSnapshots", (string)null);
                 });
 
             modelBuilder.Entity("SmartBurguerValueAPI.Models.FixedCostEntity", b =>
@@ -519,7 +519,7 @@ namespace SmartBurguerValueAPI.Migrations
 
                     b.HasIndex("EnterpriseId");
 
-                    b.ToTable("FixedCosts");
+                    b.ToTable("FixedCosts", (string)null);
                 });
 
             modelBuilder.Entity("SmartBurguerValueAPI.Models.InventoryItemEntity", b =>
@@ -553,7 +553,7 @@ namespace SmartBurguerValueAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("InventoryItem");
+                    b.ToTable("InventoryItem", (string)null);
                 });
 
             modelBuilder.Entity("SmartBurguerValueAPI.Models.ProductCostAnalysisEntity", b =>
@@ -607,7 +607,7 @@ namespace SmartBurguerValueAPI.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductCostAnalysis");
+                    b.ToTable("ProductCostAnalysis", (string)null);
                 });
 
             modelBuilder.Entity("SmartBurguerValueAPI.Models.Products.ComboEntity", b =>
@@ -666,7 +666,7 @@ namespace SmartBurguerValueAPI.Migrations
 
                     b.HasIndex("EnterpriseId");
 
-                    b.ToTable("Combos");
+                    b.ToTable("Combos", (string)null);
                 });
 
             modelBuilder.Entity("SmartBurguerValueAPI.Models.Products.ComboProductEntity", b =>
@@ -696,7 +696,7 @@ namespace SmartBurguerValueAPI.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ComboProduct");
+                    b.ToTable("ComboProduct", (string)null);
                 });
 
             modelBuilder.Entity("SmartBurguerValueAPI.Models.Products.IngredientsEntity", b =>
@@ -736,7 +736,7 @@ namespace SmartBurguerValueAPI.Migrations
 
                     b.HasIndex("UnitOfMeasureId");
 
-                    b.ToTable("Ingredients");
+                    b.ToTable("Ingredients", (string)null);
                 });
 
             modelBuilder.Entity("SmartBurguerValueAPI.Models.Products.ProductsEntity", b =>
@@ -795,7 +795,7 @@ namespace SmartBurguerValueAPI.Migrations
 
                     b.HasIndex("EnterpriseId");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("SmartBurguerValueAPI.Models.Products.ProductsIngredientsEntity", b =>
@@ -832,7 +832,7 @@ namespace SmartBurguerValueAPI.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductsIngredients");
+                    b.ToTable("ProductsIngredients", (string)null);
                 });
 
             modelBuilder.Entity("SmartBurguerValueAPI.Models.Products.UnityTypesProductsEntity", b =>
@@ -867,7 +867,7 @@ namespace SmartBurguerValueAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UnitytypesProducts");
+                    b.ToTable("UnitytypesProducts", (string)null);
                 });
 
             modelBuilder.Entity("SmartBurguerValueAPI.Models.PurchaseEntity", b =>
@@ -902,7 +902,7 @@ namespace SmartBurguerValueAPI.Migrations
 
                     b.HasIndex("EnterpriseId");
 
-                    b.ToTable("Purchase");
+                    b.ToTable("Purchase", (string)null);
                 });
 
             modelBuilder.Entity("SmartBurguerValueAPI.Models.PurchaseItemEntity", b =>
@@ -950,7 +950,7 @@ namespace SmartBurguerValueAPI.Migrations
 
                     b.HasIndex("UnityOfMensureId");
 
-                    b.ToTable("PurchaseItem");
+                    b.ToTable("PurchaseItem", (string)null);
                 });
 
             modelBuilder.Entity("SmartBurguerValueAPI.Models.SalesGoalEntity", b =>
@@ -987,7 +987,7 @@ namespace SmartBurguerValueAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SalesGoal");
+                    b.ToTable("SalesGoal", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
