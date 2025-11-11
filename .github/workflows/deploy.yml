@@ -20,27 +20,25 @@ jobs:
 
       - name: 🚀 Deploy no servidor
         run: |
-          ssh -tt -o StrictHostKeyChecking=no deploy@189.126.105.76 << 'EOF'
-          set -e
-          echo "🔄 Atualizando repositório..."
-          cd /home/deploy/SmartBurguerValue || exit
+          ssh -o StrictHostKeyChecking=no deploy@189.126.105.76 "
+            set -e
+            echo '🔄 Atualizando repositório...'
+            cd /home/deploy/SmartBurguerValue || exit
+            git fetch --all
+            git reset --hard origin/main
 
-          git fetch --all
-          git reset --hard origin/main
+            echo '🛠️ Publicando aplicação .NET...'
+            cd src/SmartBurguerValueAPI
+            dotnet publish -c Release -o /home/deploy/app
 
-          echo "🛠️ Publicando aplicação .NET..."
-          cd src/SmartBurguerValueAPI
-          dotnet publish -c Release -o /home/deploy/app
+            echo '🐳 Reiniciando container Docker...'
+            docker stop smartburguer || true
+            docker rm smartburguer || true
 
-          echo "🐳 Reiniciando container Docker..."
-          docker stop smartburguer || true
-          docker rm smartburguer || true
+            docker run -d --name smartburguer -p 80:8080 \
+              -v /home/deploy/app:/app \
+              -w /app mcr.microsoft.com/dotnet/aspnet:8.0 \
+              dotnet SmartBurguerValueAPI.dll
 
-          docker run -d --name smartburguer -p 80:8080 \
-            -v /home/deploy/app:/app \
-            -w /app mcr.microsoft.com/dotnet/aspnet:8.0 \
-            dotnet SmartBurguerValueAPI.dll
-
-          echo "✅ Deploy concluído com sucesso!"
-          exit
-          EOF
+            echo '✅ Deploy concluído com sucesso!'
+          "
