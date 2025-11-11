@@ -10,20 +10,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Checkout código
+        uses: actions/checkout@v4
 
-      - name: Set up SSH
+      - name: Configurar SSH
         uses: webfactory/ssh-agent@v0.9.0
         with:
-          ssh-private-key: ${{ secrets.SSH_Private_KEY }}
+          ssh-private-key: ${{ secrets.GITHUB_ACTIONS_KEY }}
 
-      - name: Deploy to VPS
+      - name: Deploy no servidor
         run: |
           ssh -o StrictHostKeyChecking=no deploy@189.126.105.76 << 'EOF'
-          cd /home/deploy/SmartBurguerValue
-          git pull origin main
+          echo "🔄 Atualizando repositório..."
+          cd ~/SmartBurguerValue || exit
+          git fetch --all
+          git reset --hard origin/main
+
+          echo "⚙️ Publicando API..."
           cd src/SmartBurguerValueAPI
-          dotnet publish -c Release -o /home/deploy/publish
-          sudo systemctl restart smartburguer.service
+          dotnet publish -c Release -o ~/app
+
+          echo "✅ Deploy concluído com sucesso!"
           EOF
