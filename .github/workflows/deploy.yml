@@ -35,7 +35,7 @@ jobs:
             docker stop smartburguer || true
             docker rm smartburguer || true
 
-            docker run -d --name smartburguer -p 80:8080 \
+            docker run -d --name smartburguer -p 8080:8080 \
               -v /home/deploy/app:/app \
               -w /app mcr.microsoft.com/dotnet/aspnet:8.0 \
               dotnet SmartBurguerValueAPI.dll
