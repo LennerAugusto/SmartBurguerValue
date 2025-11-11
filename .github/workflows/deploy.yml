@@ -1,4 +1,4 @@
-name: 🚀 Deploy automático para o servidor
+name: Deploy SmartBurguerValue API
 
 on:
   push:
@@ -10,27 +10,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🧾 Checkout do código
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: 🔑 Configurar chave SSH
+      - name: Set up SSH
         uses: webfactory/ssh-agent@v0.9.0
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-private-key: ${{ secrets.DEPLOY_KEY }}
 
-      - name: 🧪 Testar conexão SSH
-        run: ssh -o StrictHostKeyChecking=no deploy@189.126.105.76 "echo ✅ Conexão com o servidor estabelecida com sucesso!"
-
-      - name: 📦 Copiar arquivos para o servidor
-        run: |
-          rsync -avz --delete \
-            -e "ssh -o StrictHostKeyChecking=no" \
-            ./ deploy@189.126.105.76:/home/deploy/app/
-
-      - name: 🚀 Reiniciar serviço
+      - name: Deploy to VPS
         run: |
           ssh -o StrictHostKeyChecking=no deploy@189.126.105.76 << 'EOF'
-          cd /home/deploy/app
-          docker compose down
-          docker compose up -d --build
+          cd /home/deploy/SmartBurguerValue
+          git pull origin main
+          cd src/SmartBurguerValueAPI
+          dotnet publish -c Release -o /home/deploy/publish
+          sudo systemctl restart smartburguer.service
           EOF
