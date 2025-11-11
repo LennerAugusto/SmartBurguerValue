@@ -10,21 +10,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Pegar o código do repositório
       - name: 🧾 Checkout código
         uses: actions/checkout@v4
 
+      # 2️⃣ Configurar SSH com a chave privada do secrets
       - name: 🔐 Configurar SSH
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      # 3️⃣ Fazer o deploy no servidor remoto
       - name: 🚀 Deploy no servidor
         run: |
           ssh -tt -o StrictHostKeyChecking=no deploy@189.126.105.76 << 'EOF'
           set -e
-          echo "🔄 Atualizando repositório..."
-          cd /home/deploy/SmartBurguerValue || exit
 
+          echo "🔄 Atualizando repositório..."
+          cd ~/SmartBurguerValue || exit
           git fetch --all
           git reset --hard origin/main
 
@@ -32,11 +35,12 @@ jobs:
           cd src/SmartBurguerValueAPI
           dotnet publish -c Release -o /home/deploy/app
 
-          echo "🐳 Parando e removendo container antigo..."
+          echo "🐳 Reiniciando container Docker..."
+          # Para e remove container antigo
           docker stop smartburguer || true
           docker rm smartburguer || true
 
-          echo "🐳 Iniciando novo container na porta 8080..."
+          # Roda o container, garantindo que o Kestrel escute na porta 80 interna
           docker run -d --name smartburguer \
             -p 8080:80 \
             -v /home/deploy/app:/app \
@@ -45,5 +49,4 @@ jobs:
             dotnet SmartBurguerValueAPI.dll --urls "http://+:80"
 
           echo "✅ Deploy concluído com sucesso!"
-          exit
           EOF
