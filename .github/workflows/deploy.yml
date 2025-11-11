@@ -20,25 +20,28 @@ jobs:
 
       - name: 🚀 Deploy no servidor
         run: |
-          ssh -o StrictHostKeyChecking=no deploy@189.126.105.76 "
-            set -e
-            echo '🔄 Atualizando repositório...'
-            cd /home/deploy/SmartBurguerValue || exit
-            git fetch --all
-            git reset --hard origin/main
+          ssh -tt -o StrictHostKeyChecking=no deploy@189.126.105.76 << 'EOF'
+          set -e
 
-            echo '🛠️ Publicando aplicação .NET...'
-            cd src/SmartBurguerValueAPI
-            dotnet publish -c Release -o /home/deploy/app
+          echo "🔄 Atualizando repositório..."
+          cd /home/deploy/SmartBurguerValue || exit
+          git fetch --all
+          git reset --hard origin/main
 
-            echo '🐳 Reiniciando container Docker...'
-            docker stop smartburguer || true
-            docker rm smartburguer || true
+          echo "🛠️ Publicando aplicação .NET..."
+          cd src/SmartBurguerValueAPI
+          dotnet publish -c Release -o /home/deploy/app
 
-            docker run -d --name smartburguer -p 8080:8080 \
-              -v /home/deploy/app:/app \
-              -w /app mcr.microsoft.com/dotnet/aspnet:8.0 \
-              dotnet SmartBurguerValueAPI.dll
+          echo "🐳 Reiniciando container Docker..."
+          # Para e remove container antigo se existir
+          docker stop smartburguer || true
+          docker rm smartburguer || true
 
-            echo '✅ Deploy concluído com sucesso!'
-          "
+          # Roda o container mapeando a porta correta (5000 interna do ASP.NET)
+          docker run -d --name smartburguer -p 8080:5000 \
+            -v /home/deploy/app:/app \
+            -w /app mcr.microsoft.com/dotnet/aspnet:8.0 \
+            dotnet SmartBurguerValueAPI.dll
+
+          echo "✅ Deploy concluído com sucesso!"
+          EOF
