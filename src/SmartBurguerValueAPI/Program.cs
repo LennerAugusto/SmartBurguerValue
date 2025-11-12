@@ -103,7 +103,10 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowBlazorFrontend", policy =>
     {
         policy
-            .WithOrigins("https://localhost:7056", "https://localhost:7027") // Porta do Blazor
+            //Cors para rodar localmente
+            //.WithOrigins("https://localhost:7056", "https://localhost:7027") // Porta do Blazor
+            //Cors para rodar em produção
+            .WithOrigins("https://front.smartburguervalue.vps-kinghost.net", "https://admin.smartburguervalue.vps-kinghost.net")
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
