@@ -10,7 +10,7 @@ using SmartBurguerValueAPI.Pagination;
 
 namespace SmartBurguerValueAPI.Controllers
 {
-    [Authorize(Policy = "Enterprise")]
+    //[Authorize(Policy = "Enterprise")]
     [Microsoft.AspNetCore.Mvc.Route("api/purchase")]
     public class PurchaseController : ControllerBase
     {
@@ -42,6 +42,24 @@ namespace SmartBurguerValueAPI.Controllers
             var Purchase = await _unityOfWork.PurchaseRepository.CreatePurchase(purchase);
             await _unityOfWork.CommitAsync();
             return Ok(Purchase);
+        }
+
+        [HttpPost("upload")]
+        public async Task<IActionResult> UploadXml(IFormFile file, [FromQuery] Guid enterpriseId)
+        {
+
+            if (file == null || file.Length == 0)
+                return BadRequest("Nenhum arquivo enviado.");
+
+            var Purchase = await _unityOfWork.PurchaseRepository.CreatePurchaseByXml(file, enterpriseId);
+            await _unityOfWork.CommitAsync();
+            return Ok(Purchase);
+            //using var reader = new StreamReader(file.OpenReadStream());
+            //var xmlContent = await reader.ReadToEndAsync();
+
+            //var dto = _xmlParserService.ParseXmlToPurchaseDTO(xmlContent, enterpriseId);
+
+            //var purchase = await _purchaseXmlService.ProcessXmlPurchaseAsync(dto);
         }
 
 

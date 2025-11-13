@@ -18,17 +18,12 @@ using System.Text;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// =====================
 // Configuração do banco de dados
-// =====================
 var mySqlConnection = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(mySqlConnection, ServerVersion.AutoDetect(mySqlConnection)));
 
-// =====================
-// Configuração de identidade e autenticação JWT
-// =====================
+// Configuração de autenticação JWT
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
@@ -58,9 +53,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// =====================
 // Políticas de autorização
-// =====================
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
@@ -70,9 +63,7 @@ builder.Services.AddAuthorization(options =>
             context.User.IsInRole("Admin") || context.User.IsInRole("Enterprise")));
 });
 
-// =====================
 // Serviços e Repositórios
-// =====================
 builder.Services.AddScoped<IUnityOfWork, UnityOfWork>();
 builder.Services.AddScoped(typeof(IRepositoryBase<>), typeof(RepositoryBase<>));
 builder.Services.AddScoped<IUnityTypesRepository, UnityTypesProductsRepository>();
@@ -89,15 +80,10 @@ builder.Services.AddScoped<IFinancialSnapshotsRepository, FinancialSnapshotsRepo
 builder.Services.AddScoped<IProductCostAnalysisRepository, ProductCostAnalysisRepository>();
 builder.Services.AddScoped<IAnalysisByPeriodRepository, AnalysisByPeriodRepository>();  
 builder.Services.AddScoped<IAnalysisByPeriodYearsRepository, AnalysisByPeriodYearRepository>();  
-// =====================
-// Serviços auxiliares
-// =====================
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-// =====================
 // CORS para acesso do Blazor WebAssembly
-// =====================
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowBlazorFrontend", policy =>
@@ -112,18 +98,13 @@ builder.Services.AddCors(options =>
     });
 });
 
-// =====================
-// Controllers e JSON
-// =====================
+
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
 
-// =====================
-// Swagger
-// =====================
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -157,9 +138,6 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// =====================
-// Middleware
-// =====================
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -170,7 +148,7 @@ app.UseHttpsRedirection();
 
 app.UseCors("AllowBlazorFrontend");
 
-app.UseAuthentication(); // Importante: antes do UseAuthorization
+app.UseAuthentication(); 
 app.UseAuthorization();
 
 app.MapControllers();
