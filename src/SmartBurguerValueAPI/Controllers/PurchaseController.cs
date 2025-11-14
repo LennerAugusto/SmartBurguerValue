@@ -44,22 +44,16 @@ namespace SmartBurguerValueAPI.Controllers
             return Ok(Purchase);
         }
 
-        [HttpPost("upload")]
-        public async Task<IActionResult> UploadXml(IFormFile file, [FromQuery] Guid enterpriseId)
+        [HttpPost("create/by-upload-xml")]
+        public async Task<IActionResult> UploadXml(IFormFile File, Guid enterpriseId)
         {
 
-            if (file == null || file.Length == 0)
+            if (File == null || File.Length == 0)
                 return BadRequest("Nenhum arquivo enviado.");
 
-            var Purchase = await _unityOfWork.PurchaseRepository.CreatePurchaseByXml(file, enterpriseId);
+            var Purchase = await _unityOfWork.PurchaseRepository.CreatePurchaseByXml(File, enterpriseId);
             await _unityOfWork.CommitAsync();
             return Ok(Purchase);
-            //using var reader = new StreamReader(file.OpenReadStream());
-            //var xmlContent = await reader.ReadToEndAsync();
-
-            //var dto = _xmlParserService.ParseXmlToPurchaseDTO(xmlContent, enterpriseId);
-
-            //var purchase = await _purchaseXmlService.ProcessXmlPurchaseAsync(dto);
         }
 
 

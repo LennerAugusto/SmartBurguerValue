@@ -7,7 +7,7 @@ namespace SmartBurguerValueAPI.Controllers
         [HttpGet("ping")]
         public IActionResult Ping()
         {
-            return Ok("API está rodando!");
+            return Ok("API está rodando!!");
         }
     }
 }

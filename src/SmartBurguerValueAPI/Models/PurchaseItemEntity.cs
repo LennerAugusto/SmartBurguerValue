@@ -14,7 +14,7 @@ namespace SmartBurguerValueAPI.Models
         public Guid UnityOfMensureId { get; set;}
         public Guid IngredientId { get; set;}
         public UnityTypesProductsEntity UnityOfMensure { get; set; }
-        [Column(TypeName = "decimal(18,0)")]
+        [Column(TypeName = "decimal(10,2)")]
         public decimal Quantity { get; set; }
         [Column(TypeName = "decimal(10,2)")]
         public decimal UnitPrice { get; set; }
