@@ -28,6 +28,7 @@ namespace SmartBurguerValueAPI.Repository
                 EnterpriseId = dto.EnterpriseId,
                 DateCreated = DateTime.UtcNow,
                 DateUpdated = DateTime.UtcNow,
+                HiringDate = dto.HiringDate,
                 IsActive = true
             };
 
@@ -65,6 +66,7 @@ namespace SmartBurguerValueAPI.Repository
                     MonthlySalary = x.MonthlySalary,
                     EnterpriseId = x.EnterpriseId,
                     IsActive = x.IsActive,
+                    HiringDate = x.HiringDate,
                     WorkSchedules = x.EmployeeSchedules.Select(ws => new WorkScheduleDTO
                     {
                         Weekday = ws.WeekDay,
@@ -87,7 +89,7 @@ namespace SmartBurguerValueAPI.Repository
             employee.EmployeeType = dto.EmploymentType;
             employee.MonthlySalary = dto.MonthlySalary;
             employee.DateUpdated = DateTime.UtcNow;
-
+            employee.HiringDate = dto.HiringDate;
             if (dto.EmploymentType == "Daily")
             {
                 var oldSchedules = await _context.EmployeesWorkSchedule

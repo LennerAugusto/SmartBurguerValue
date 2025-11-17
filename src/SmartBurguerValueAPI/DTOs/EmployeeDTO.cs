@@ -7,6 +7,7 @@
         public string? EmploymentType { get; set; } 
         public decimal? MonthlySalary { get; set; }
         public Guid EnterpriseId { get; set; }
+        public DateTime? HiringDate { get; set; }
 
         public List<WorkScheduleDTO> WorkSchedules { get; set; } = new();
     }
