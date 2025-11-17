@@ -317,15 +317,15 @@ namespace SmartBurguerValueAPI.Repository
             if (granularity == "day")
             {
                 var dailyCombos = await baseQuery
-                    .SelectMany(d => d.Items
+                    .SelectMany(d => d.Items)
                         .Where(i => i.ComboId != null)
                         .Select(i => new
                         {
-                            Date = d.EntryDate.Date,
+                            Date = i.DailyEntry.EntryDate.Date,
                             ComboId = i.ComboId,
-                            ComboName = i.Combo != null ? i.Combo.Name : null,
+                            ComboName = i.Combo.Name,
                             Quantity = i.Quantity
-                        }))
+                        })
                     .GroupBy(x => new { x.Date, x.ComboId, x.ComboName })
                     .Select(g => new
                     {
@@ -354,26 +354,27 @@ namespace SmartBurguerValueAPI.Repository
             else if (granularity == "month")
             {
                 var monthlyCombos = await baseQuery
-                    .SelectMany(d => d.Items
-                        .Where(i => i.ComboId != null)
-                        .Select(i => new
-                        {
-                            Year = d.EntryDate.Year,
-                            Month = d.EntryDate.Month,
-                            ComboId = i.ComboId,
-                            ComboName = i.Combo != null ? i.Combo.Name : null,
-                            Quantity = i.Quantity
-                        }))
-                    .GroupBy(x => new { x.Year, x.Month, x.ComboId, x.ComboName })
-                    .Select(g => new
-                    {
-                        g.Key.Year,
-                        g.Key.Month,
-                        g.Key.ComboId,
-                        g.Key.ComboName,
-                        Quantity = g.Sum(x => (int?)x.Quantity) ?? 0
-                    })
-                    .ToListAsync();
+    .SelectMany(d => d.Items)
+    .Where(i => i.ComboId != null)
+    .Select(i => new
+    {
+        Year = i.DailyEntry.EntryDate.Year,
+        Month = i.DailyEntry.EntryDate.Month,
+        ComboId = i.ComboId,
+        ComboName = i.Combo.Name,
+        Quantity = i.Quantity
+    })
+    .GroupBy(x => new { x.Year, x.Month, x.ComboId, x.ComboName })
+    .Select(g => new
+    {
+        g.Key.Year,
+        g.Key.Month,
+        g.Key.ComboId,
+        g.Key.ComboName,
+        Quantity = g.Sum(x => x.Quantity)
+    })
+    .ToListAsync();
+
 
                 for (var date = new DateTime(start.Year, start.Month, 1); date <= end; date = date.AddMonths(1))
                 {
@@ -393,14 +394,14 @@ namespace SmartBurguerValueAPI.Repository
             else
             {
                 var totalCombo = await baseQuery
-                    .SelectMany(d => d.Items
+                    .SelectMany(d => d.Items)
                         .Where(i => i.ComboId != null)
                         .Select(i => new
                         {
                             ComboId = i.ComboId,
                             ComboName = i.Combo != null ? i.Combo.Name : null,
                             Quantity = i.Quantity
-                        }))
+                        })
                     .GroupBy(x => new { x.ComboId, x.ComboName })
                     .Select(g => new
                     {
@@ -445,15 +446,15 @@ namespace SmartBurguerValueAPI.Repository
             if (granularity == "day")
             {
                 var dailyCombos = await baseQuery
-                    .SelectMany(d => d.Items
+                    .SelectMany(d => d.Items)
                         .Where(i => i.ComboId == null)
                         .Select(i => new
                         {
-                            Date = d.EntryDate.Date,
+                            Date = i.DailyEntry.EntryDate.Date,
                             ProductId = i.ProductId,
                             ProductName = i.Product != null ? i.Product.Name : null,
                             Quantity = i.Quantity
-                        }))
+                        })
                     .GroupBy(x => new { x.Date, x.ProductId, x.ProductName })
                     .Select(g => new
                     {
@@ -482,26 +483,26 @@ namespace SmartBurguerValueAPI.Repository
             else if (granularity == "month")
             {
                 var monthlyCombos = await baseQuery
-                    .SelectMany(d => d.Items
-                        .Where(i => i.ComboId == null)
-                        .Select(i => new
-                        {
-                            Year = d.EntryDate.Year,
-                            Month = d.EntryDate.Month,
-                            ProductId = i.ProductId,
-                            ProductName = i.Product != null ? i.Product.Name : null,
-                            Quantity = i.Quantity
-                        }))
-                    .GroupBy(x => new { x.Year, x.Month, x.ProductId, x.ProductName })
-                    .Select(g => new
-                    {
-                        g.Key.Year,
-                        g.Key.Month,
-                        g.Key.ProductId,
-                        g.Key.ProductName,
-                        Quantity = g.Sum(x => (int?)x.Quantity) ?? 0
-                    })
-                    .ToListAsync();
+     .Select(d => new { d.EntryDate, Items = d.Items })   
+     .SelectMany(x => x.Items, (x, i) => new { x.EntryDate, Item = i })
+     .Where(x => x.Item.ComboId == null)
+     .GroupBy(x => new
+     {
+         x.EntryDate.Year,
+         x.EntryDate.Month,
+         x.Item.ProductId,
+         ProductName = x.Item.Product != null ? x.Item.Product.Name : null
+     })
+     .Select(g => new
+     {
+         Year = g.Key.Year,
+         Month = g.Key.Month,
+         ProductId = g.Key.ProductId,
+         ProductName = g.Key.ProductName,
+         Quantity = g.Sum(x => (int?)x.Item.Quantity) ?? 0
+     })
+     .ToListAsync();
+
 
                 for (var date = new DateTime(start.Year, start.Month, 1); date <= end; date = date.AddMonths(1))
                 {
@@ -521,14 +522,14 @@ namespace SmartBurguerValueAPI.Repository
             else
             {
                 var totalCombo = await baseQuery
-                    .SelectMany(d => d.Items
+                    .SelectMany(d => d.Items)
                         .Where(i => i.ComboId == null)
                         .Select(i => new
                         {
                             ProductId = i.ProductId,
                             ProductName = i.Product != null ? i.Product.Name : null,
                             Quantity = i.Quantity
-                        }))
+                        })
                     .GroupBy(x => new { x.ProductId, x.ProductName })
                     .Select(g => new
                     {
@@ -664,7 +665,7 @@ namespace SmartBurguerValueAPI.Repository
                     var workedDaysCount = 0;
                     for (var day = effectiveStart; day <= effectiveEnd; day = day.AddDays(1))
                     {
-                        var dayOfWeekStr = day.DayOfWeek.ToString(); 
+                        var dayOfWeekStr = day.DayOfWeek.ToString();
                         var schedule = emp.EmployeeSchedules
                             .FirstOrDefault(ws => ws.WeekDay.Equals(dayOfWeekStr, StringComparison.OrdinalIgnoreCase));
 
@@ -864,7 +865,7 @@ namespace SmartBurguerValueAPI.Repository
 
             var employees = await _context.Employees
                 .Where(e => e.EnterpriseId == enterpriseId)
-                .Select(e => new { e.MonthlySalary, e.HiringDate, e.DateCreated, e.IsActive})
+                .Select(e => new { e.MonthlySalary, e.HiringDate, e.DateCreated, e.IsActive })
                 .ToListAsync();
 
             decimal totalEmployeeCost = 0m;
@@ -872,7 +873,7 @@ namespace SmartBurguerValueAPI.Repository
             foreach (var emp in employees)
             {
                 if (emp.HiringDate == null)
-                    continue; 
+                    continue;
 
                 var hireDate = emp.HiringDate.Value.Date;
 

@@ -86,15 +86,17 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 // CORS para acesso do Blazor WebAssembly
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowBlazorFrontend", policy =>
+    options.AddPolicy("CorsPolicy", policy =>
     {
-        policy
-            //Cors para rodar localmente
-            //.WithOrigins("https://localhost:7056", "https://localhost:7027") // Porta do Blazor
-            //Cors para rodar em produção
-            .WithOrigins("https://front.smartburguervalue.vps-kinghost.net", "https://admin.smartburguervalue.vps-kinghost.net")
-            .AllowAnyHeader()
-            .AllowAnyMethod();
+        policy.WithOrigins(
+               "https://front.smartburguervalue.vps-kinghost.net",
+               "https://admin.smartburguervalue.vps-kinghost.net"
+               //"https://localhost:7056", 
+               //"https://localhost:7027"
+           )
+           .AllowAnyHeader()
+           .AllowAnyMethod()
+           .AllowCredentials();
     });
 });
 
@@ -144,9 +146,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
-app.UseCors("AllowBlazorFrontend");
+app.UseCors("CorsPolicy");
 
 app.UseAuthentication(); 
 app.UseAuthorization();
