@@ -864,7 +864,7 @@ namespace SmartBurguerValueAPI.Repository
 
             var employees = await _context.Employees
                 .Where(e => e.EnterpriseId == enterpriseId)
-                .Select(e => new { e.MonthlySalary, e.HiringDate, e.DateCreated })
+                .Select(e => new { e.MonthlySalary, e.HiringDate, e.DateCreated, e.IsActive})
                 .ToListAsync();
 
             decimal totalEmployeeCost = 0m;
@@ -896,7 +896,8 @@ namespace SmartBurguerValueAPI.Repository
             }
             return new GetEmployeesAnalysisDTO
             {
-                TotalEmployeesActive = employees.Count(e => e.DateCreated <= endDate),
+                TotalEmployeesActive = employees
+                                       .Count(e => e.HiringDate <= endDate && e.IsActive),
                 TotalSalaries = Math.Round(totalEmployeeCost, 2)
             };
         }
