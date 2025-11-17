@@ -828,35 +828,79 @@ namespace SmartBurguerValueAPI.Repository
             }
             return series;
         }
+        //public async Task<GetEmployeesAnalysisDTO> GetEmployeesAnalysis(EPeriod period, Guid enterpriseId)
+        //{
+
+        //    DateTime startDate = SelectPeriod(period);
+        //    DateTime endDate = DateTime.UtcNow;
+
+        //    var employees = await _context.Employees
+        //          .Where(e => e.EnterpriseId == enterpriseId)
+        //          .Select(e => new { e.MonthlySalary, e.HiringDate, e.DateCreated }).ToListAsync();
+        //   var totalEmployeeCost = 0m;
+        //    foreach (var emp in employees)
+        //    {
+        //        if (emp.HiringDate > endDate)
+        //            continue;
+
+        //        var effectiveStart = emp.HiringDate > startDate ? emp.HiringDate : startDate;
+        //        var effectiveEnd = endDate;
+        //        var activeDays = (effectiveEnd - effectiveStart).TotalDays;
+        //        if (activeDays <= 0) continue;
+        //        var proportionalMonths = activeDays / 30.0;
+        //       totalEmployeeCost = (decimal)(emp.MonthlySalary * (decimal)proportionalMonths);
+        //    }
+
+        //    return new GetEmployeesAnalysisDTO
+        //    {
+        //       TotalEmployeesActive = employees.Count(e => e.DateCreated <= endDate),
+        //       TotalSalaries = Math.Round((decimal)totalEmployeeCost, 2)
+        //    };
+        //}
         public async Task<GetEmployeesAnalysisDTO> GetEmployeesAnalysis(EPeriod period, Guid enterpriseId)
         {
-
-            DateTime startDate = SelectPeriod(period);
-            DateTime endDate = DateTime.UtcNow;
+            DateTime startDate = SelectPeriod(period).Date;
+            DateTime endDate = DateTime.UtcNow.Date;
 
             var employees = await _context.Employees
-                  .Where(e => e.EnterpriseId == enterpriseId)
-                  .Select(e => new { e.MonthlySalary, e.DateCreated }).ToListAsync();
-           var totalEmployeeCost = 0m;
+                .Where(e => e.EnterpriseId == enterpriseId)
+                .Select(e => new { e.MonthlySalary, e.HiringDate, e.DateCreated })
+                .ToListAsync();
+
+            decimal totalEmployeeCost = 0m;
+
             foreach (var emp in employees)
             {
-                if (emp.DateCreated > endDate)
+                if (emp.HiringDate == null)
+                    continue; 
+
+                var hireDate = emp.HiringDate.Value.Date;
+
+                if (hireDate > endDate)
                     continue;
 
-                var effectiveStart = emp.DateCreated > startDate ? emp.DateCreated : startDate;
+                var effectiveStart = hireDate > startDate ? hireDate : startDate;
                 var effectiveEnd = endDate;
-                var activeDays = (effectiveEnd - effectiveStart).TotalDays;
-                if (activeDays <= 0) continue;
-                var proportionalMonths = activeDays / 30.0;
-               totalEmployeeCost = (decimal)(emp.MonthlySalary * (decimal)proportionalMonths);
-            }
 
+                if (effectiveStart > effectiveEnd)
+                    continue;
+
+                var activeDays = (effectiveEnd - effectiveStart).TotalDays;
+
+                if (activeDays <= 0)
+                    continue;
+
+                var proportionalMonths = activeDays / 30.0;
+
+                totalEmployeeCost += emp.MonthlySalary.GetValueOrDefault() * (decimal)proportionalMonths;
+            }
             return new GetEmployeesAnalysisDTO
             {
-               TotalEmployeesActive = employees.Count(e => e.DateCreated <= endDate),
-               TotalSalaries = Math.Round((decimal)totalEmployeeCost, 2)
+                TotalEmployeesActive = employees.Count(e => e.DateCreated <= endDate),
+                TotalSalaries = Math.Round(totalEmployeeCost, 2)
             };
         }
+
         public async Task<List<GetEmployeesCostByPeriodDTO>> GetTotalEmployeeCostByPeriod(EPeriod period, Guid enterpriseId)
         {
             var range = GetPeriod(period);
